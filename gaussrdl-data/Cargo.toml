@@ -1,0 +1,28 @@
+[package]
+name = "gaussrdl-data"
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name <your.email@example.com>"]
+license = "MIT"
+repository = "https://github.com/yourusername/gaussrdl"
+description = "Data loading, datasets, and data processing for GaussRDL"
+
+[dependencies]
+gaussrdl-core = { path = "../gaussrdl-core" }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+polars = { workspace = true, features = ["lazy", "temporal", "strings", "parquet"] }
+chrono = { workspace = true, features = ["serde"] }
+uuid = { workspace = true, features = ["v4", "serde"] }
+reqwest = { workspace = true, features = ["json", "stream", "blocking"] }
+tempfile = { workspace = true }
+dirs = { workspace = true }
+indicatif = { workspace = true }
+candle-core = { workspace = true }
+num_cpus = { workspace = true }
+rand = { workspace = true, features = ["std_rng"] }
+sha2 = { workspace = true }
+rayon = { workspace = true } 

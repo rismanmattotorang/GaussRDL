@@ -1,0 +1,37 @@
+[package]
+name = "gaussrdl-utils"
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name <your.email@example.com>"]
+license = "MIT"
+repository = "https://github.com/yourusername/gaussrdl"
+description = "Utility functions and helpers for GaussRDL"
+
+[features]
+default = []
+cuda = []
+metal = []
+
+[dependencies]
+parking_lot = "0.12"
+rayon = "1.10"
+rand = "0.8"
+dirs = "5.0"
+gaussrdl-core = { path = "../gaussrdl-core" }
+gaussrdl-models = { path = "../gaussrdl-models" }
+serde = { workspace = true, features = ["derive"] }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
+log = { workspace = true }
+sysinfo = { workspace = true }
+num_cpus = { workspace = true } 
+rand_distr = "0.4"
+candle-core = "0.3"
+half = "2.3"
+reqwest = { version = "0.11", features = ["blocking", "json"] }
+tempfile = "3.10"
+memmap2 = "0.9"
+futures = "0.3" 

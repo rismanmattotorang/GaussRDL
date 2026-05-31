@@ -1,0 +1,26 @@
+[package]
+name = "gaussrdl-models"
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name <your.email@example.com>"]
+license = "MIT"
+repository = "https://github.com/yourusername/gaussrdl"
+description = "ML models and neural networks for GaussRDL"
+
+[dependencies]
+gaussrdl-core = { path = "../gaussrdl-core" }
+gaussrdl-graph = { path = "../gaussrdl-graph" }
+candle-core = { workspace = true }
+candle-nn = { workspace = true }
+half = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+chrono = { version = "0.4", features = ["serde"] }
+sha2 = "0.10" 
+serde_json = { version = "1.0", features = ["std"] }
+toml = { version = "0.7" } 
+gaussrdl-data = { path = "../gaussrdl-data" } 
+
+[dev-dependencies]
+tempfile = "3.8" 

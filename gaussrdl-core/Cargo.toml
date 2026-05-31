@@ -1,0 +1,24 @@
+[package]
+name = "gaussrdl-core"
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name <your.email@example.com>"]
+license = "MIT"
+repository = "https://github.com/yourusername/gaussrdl"
+description = "Core types and traits for GaussRDL"
+
+[dependencies]
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+thiserror = "1.0"
+chrono = { workspace = true, features = ["serde"] }
+uuid = { workspace = true, features = ["v4", "serde"] }
+candle-core = { workspace = true }
+polars = { workspace = true, features = ["lazy", "temporal", "strings", "parquet"] }
+async-trait = "0.1"
+half = "2.3"
+dirs = "5.0"
+regex = "1.10"
+reqwest = { version = "0.11", features = ["blocking"] }
+tempfile = "3.8" 

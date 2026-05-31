@@ -1,0 +1,25 @@
+[package]
+name = "gaussrdl-cli"
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name <your.email@example.com>"]
+license = "MIT"
+repository = "https://github.com/yourusername/gaussrdl"
+description = "Command-line interface for GaussRDL"
+
+[dependencies]
+clap = { version = "4.0", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0" }
+toml = { version = "0.7" }
+chrono = { version = "0.4", features = ["serde"] }
+async-trait = "0.1"
+tokio = { version = "1.0", features = ["full"] }
+gaussrdl-core = { path = "../gaussrdl-core" }
+gaussrdl-data = { path = "../gaussrdl-data" }
+gaussrdl-database = { path = "../gaussrdl-database" }
+gaussrdl-models = { path = "../gaussrdl-models" }
+gaussrdl-training = { path = "../gaussrdl-training" }
+gaussrdl-server = { path = "../gaussrdl-server" }
+env_logger = { workspace = true } 
+serde_yaml = { version = "0.9" } 

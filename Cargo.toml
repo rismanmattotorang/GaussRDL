@@ -1,73 +1,114 @@
-[package]
-name = "relbench"
-version = "1.0.0"
+[workspace]
+name = "gaussrdl"
+resolver = "2"
+members = [
+    "gaussrdl-core",
+    "gaussrdl-data", 
+    "gaussrdl-graph",
+    "gaussrdl-models",
+    "gaussrdl-training",
+    "gaussrdl-metrics",
+    "gaussrdl-database",
+    "gaussrdl-server",
+    "gaussrdl-cli",
+    "gaussrdl-utils",
+    "gaussrdl"
+]
+
+[workspace.package]
+version = "0.1.0"
 edition = "2021"
-description = "A high-performance Rust implementation of the Relational Deep Learning Benchmark"
 authors = ["Your Name <your.email@example.com>"]
 license = "MIT"
-repository = "https://github.com/yourusername/relbench"
-documentation = "https://docs.rs/relbench"
-readme = "README.md"
-keywords = ["machine-learning", "deep-learning", "benchmark", "relational", "graph"]
-categories = ["science", "machine-learning"]
+repository = "https://github.com/yourusername/gaussrdl"
+description = "Gaussian Relational Deep Learning Toolkit"
 
-[dependencies]
+[workspace.dependencies]
 # Core dependencies
-thiserror = "1.0"
+tokio = { version = "1.0", features = ["full"] }
+async-trait = "0.1"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 serde_yaml = "0.9"
+anyhow = "1.0"
+thiserror = "1.0"
+
+# CLI dependencies
+clap = { version = "4.0", features = ["derive"] }
+env_logger = "0.10"
+
+# Server dependencies
+axum = "0.7"
+tower-http = { version = "0.4", features = ["trace", "cors"] }
+utoipa = { version = "4.0", features = ["axum_extras"] }
+utoipa-swagger-ui = { version = "4.0", features = ["axum"] }
 
 # Data processing
-polars = { version = "0.35", features = ["lazy", "parquet"] }
+polars = { version = "0.35", features = ["lazy", "temporal", "strings", "parquet"] }
 chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.0", features = ["v4", "serde"] }
 
-# Memory management
-memmap2 = "0.9"
+# ML and tensor operations
+candle-core = "0.3"
+candle-nn = "0.3"
+half = "2.0"
+
+# Async and concurrency
+rayon = "1.7"
 parking_lot = "0.12"
+crossbeam = "0.8"
+futures = "0.3"
 
-# Parallel processing
-rayon = "1.8"
-num_cpus = "1.16"
+# Memory and caching
+lru = "0.12"
 
-# Networking
-reqwest = { version = "0.11", features = ["blocking", "json"] }
-url = "2.5"
+# Database
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "chrono", "uuid"] }
 
-# Logging and metrics
+# Crypto and hashing
+sha2 = "0.10"
+blake3 = "1.4"
+
+# HTTP client
+reqwest = { version = "0.11", features = ["json", "stream", "blocking"] }
+
+# File I/O
+memmap2 = "0.9"
+tempfile = "3.0"
+dirs = "5.0"
+flate2 = "1.0"
+tar = "0.4"
+indicatif = "0.17"
+
+# Configuration
+toml = "0.8"
+config = "0.13"
+
+# Monitoring and metrics
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+prometheus = "0.13"
 
-# CLI
-clap = { version = "4.4", features = ["derive"] }
+# Random number generation
+rand = { version = "0.8", features = ["std_rng"] }
+rand_distr = "0.4"
 
-[dev-dependencies]
-tempfile = "3.9"
+# System information
+num_cpus = "1.15"
+log = "0.4"
+sysinfo = "0.29"
+
+# CUDA dependencies
+cuda-runtime-sys = "0.3.0-alpha.1"
+cuda-driver-sys = "0.3.0-alpha.1"
+
+# Dev dependencies for all crates
+criterion = { version = "0.5", features = ["html_reports"] }
+proptest = "1.0"
 tokio-test = "0.4"
-assert_fs = "1.0"
-predicates = "3.0"
-criterion = "0.5"
-proptest = "1.4"
 
-[features]
-default = []
-cuda = []
-metal = []
+# Ensure consistent float ordering
+ordered-float = "4.0"
 
-[profile.release]
-lto = true
-codegen-units = 1
-panic = "abort"
-opt-level = 3
-
-[profile.dev]
-opt-level = 0
-debug = true
-
-[profile.test]
-opt-level = 0
-debug = true
-
-[package.metadata.docs.rs]
-all-features = true
-rustdoc-args = ["--cfg", "docsrs"]
+[patch.crates-io]
+candle-core = { path = "patches/candle-core-0.3.3" }

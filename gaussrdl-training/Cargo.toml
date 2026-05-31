@@ -1,0 +1,27 @@
+[package]
+name = "gaussrdl-training"
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name <your.email@example.com>"]
+license = "MIT"
+repository = "https://github.com/yourusername/gaussrdl"
+description = "Training infrastructure and optimizers for GaussRDL"
+
+[dependencies]
+gaussrdl-core = { path = "../gaussrdl-core" }
+gaussrdl-data = { path = "../gaussrdl-data" }
+gaussrdl-models = { path = "../gaussrdl-models" }
+gaussrdl-metrics = { path = "../gaussrdl-metrics" }
+gaussrdl-graph = { path = "../gaussrdl-graph" }
+polars = { workspace = true }
+tempfile = { workspace = true }
+chrono = { workspace = true, features = ["serde"] }
+candle-core = { workspace = true }
+candle-nn = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_yaml = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+rand = { workspace = true, features = ["std_rng"] }
+rand_distr = { workspace = true }
+tokio = { workspace = true, features = ["full"] } 

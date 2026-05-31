@@ -1,0 +1,16 @@
+[package]
+name = "gaussrdl-metrics"
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name <your.email@example.com>"]
+license = "MIT"
+repository = "https://github.com/yourusername/gaussrdl"
+description = "Evaluation metrics and monitoring for GaussRDL"
+
+[dependencies]
+gaussrdl-core = { path = "../gaussrdl-core" }
+serde = { workspace = true, features = ["derive"] }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+prometheus = { workspace = true }
+tracing = { workspace = true } 

@@ -1,0 +1,108 @@
+[package]
+name = "gaussrdl"
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name <your.email@example.com>"]
+license = "MIT"
+repository = "https://github.com/yourusername/gaussrdl"
+description = "Gaussian Relational Deep Learning Toolkit - Main Library"
+
+[features]
+default = []
+cuda = ["cuda-runtime-sys", "cuda-driver-sys"]
+
+[dependencies]
+# Internal crates
+gaussrdl-core = { path = "../gaussrdl-core" }
+gaussrdl-data = { path = "../gaussrdl-data" }
+gaussrdl-graph = { path = "../gaussrdl-graph" }
+gaussrdl-models = { path = "../gaussrdl-models" }
+gaussrdl-training = { path = "../gaussrdl-training" }
+gaussrdl-metrics = { path = "../gaussrdl-metrics" }
+gaussrdl-database = { path = "../gaussrdl-database" }
+gaussrdl-server = { path = "../gaussrdl-server" }
+gaussrdl-cli = { path = "../gaussrdl-cli" }
+gaussrdl-utils = { path = "../gaussrdl-utils" }
+
+# External dependencies
+tokio = { workspace = true, features = ["full"] }
+async-trait = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# CLI dependencies
+clap = { workspace = true, features = ["derive"] }
+env_logger = { workspace = true }
+
+# Server dependencies
+axum = { workspace = true }
+tower-http = { workspace = true, features = ["trace", "cors"] }
+utoipa = { workspace = true, features = ["axum_extras"] }
+utoipa-swagger-ui = { workspace = true, features = ["axum"] }
+
+# Data processing
+polars = { workspace = true, features = ["lazy", "temporal", "strings", "parquet"] }
+chrono = { workspace = true, features = ["serde"] }
+uuid = { workspace = true, features = ["v4", "serde"] }
+
+# ML and tensor operations
+candle-core = { workspace = true }
+candle-nn = { workspace = true }
+half = { workspace = true }
+
+# Async and concurrency
+rayon = { workspace = true }
+parking_lot = { workspace = true }
+crossbeam = { workspace = true }
+futures = { workspace = true }
+
+# Memory and caching
+lru = { workspace = true }
+
+# Database
+sqlx = { workspace = true, features = ["runtime-tokio-rustls", "postgres", "chrono", "uuid"] }
+
+# Crypto and hashing
+sha2 = { workspace = true }
+blake3 = { workspace = true }
+
+# HTTP client
+reqwest = { workspace = true, features = ["json", "stream", "blocking"] }
+
+# File I/O
+memmap2 = { workspace = true }
+tempfile = { workspace = true }
+dirs = { workspace = true }
+flate2 = { workspace = true }
+tar = { workspace = true }
+indicatif = { workspace = true }
+
+# Configuration
+toml = { workspace = true }
+config = { workspace = true }
+
+# Monitoring and metrics
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
+prometheus = { workspace = true }
+
+# Random number generation
+rand = { workspace = true, features = ["std_rng"] }
+rand_distr = { workspace = true }
+
+# System information
+num_cpus = { workspace = true }
+log = { workspace = true }
+sysinfo = { workspace = true }
+
+# CUDA dependencies
+cuda-runtime-sys = { workspace = true, optional = true }
+cuda-driver-sys = { workspace = true, optional = true }
+
+[dev-dependencies]
+criterion = { workspace = true, features = ["html_reports"] }
+proptest = { workspace = true }
+tokio-test = { workspace = true } 
