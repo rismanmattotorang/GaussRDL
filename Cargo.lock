@@ -1642,6 +1642,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "gaussrdl-bench"
+version = "0.3.0"
+dependencies = [
+ "gaussrdl-rdl",
+ "reqwest",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "gaussrdl-cli"
 version = "0.1.0"
 dependencies = [
@@ -1862,6 +1872,7 @@ dependencies = [
 name = "gaussrdl-tui"
 version = "0.2.0"
 dependencies = [
+ "gaussrdl-bench",
  "gaussrdl-rdl",
  "ratatui",
 ]
@@ -1899,6 +1910,7 @@ name = "gaussrdl-web"
 version = "0.2.0"
 dependencies = [
  "axum 0.7.9",
+ "gaussrdl-bench",
  "gaussrdl-rdl",
  "serde",
  "serde_json",

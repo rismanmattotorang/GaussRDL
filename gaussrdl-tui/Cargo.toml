@@ -8,6 +8,7 @@ description = "Terminal UI for the GaussRDL v2 engine: configure model parameter
 
 [dependencies]
 gaussrdl-rdl = { path = "../gaussrdl-rdl" }
+gaussrdl-bench = { path = "../gaussrdl-bench" }
 ratatui = "0.28"
 
 [[bin]]

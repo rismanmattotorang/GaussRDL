@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>GaussRDL — Gaussian Technologies</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+ :root{
+   --bg:#0a0e1a;--bg2:#0e1430;--card:#141c33;--line:#243056;--fg:#e9edf8;
+   --mut:#8ea0c8;--acc:#5b8cff;--acc2:#8a6bff;--ok:#37d39b;--warn:#ffb454;--err:#ff6b81;
+ }
+ *{box-sizing:border-box}
+ body{margin:0;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+   background:radial-gradient(1200px 600px at 80% -10%,#15224a 0,var(--bg) 55%);color:var(--fg);min-height:100vh}
+ header{display:flex;align-items:center;gap:14px;padding:18px 28px;border-bottom:1px solid var(--line)}
+ .logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--acc),var(--acc2));
+   box-shadow:0 0 22px rgba(91,140,255,.5)}
+ h1{font-size:19px;margin:0;letter-spacing:.2px}
+ .sub{color:var(--mut);font-size:13px}
+ .tabs{display:flex;gap:6px;padding:14px 28px 0}
+ .tab{padding:9px 16px;border-radius:9px 9px 0 0;background:transparent;color:var(--mut);
+   border:1px solid transparent;cursor:pointer;font-weight:600}
+ .tab.active{background:var(--card);color:var(--fg);border-color:var(--line);border-bottom-color:var(--card)}
+ main{padding:0 28px 40px}
+ .panel{display:none} .panel.active{display:block}
+ .card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:16px}
+ .grid{display:grid;gap:14px}
+ .ds-grid{grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}
+ .ds{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:15px;display:flex;flex-direction:column;gap:8px}
+ .ds h3{margin:0;font-size:15px} .ds .meta{color:var(--mut);font-size:12px}
+ .ds .desc{font-size:13px;color:#c4cdea;min-height:38px}
+ .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700}
+ .b-ready{background:rgba(55,211,155,.16);color:var(--ok)}
+ .b-no{background:rgba(142,160,200,.16);color:var(--mut)}
+ .b-err{background:rgba(255,107,129,.16);color:var(--err)}
+ .b-official{background:rgba(138,107,255,.18);color:#b9a6ff}
+ .b-prepared{background:rgba(91,140,255,.16);color:var(--acc)}
+ .chips{display:flex;flex-wrap:wrap;gap:6px}
+ .chip{font-size:11px;color:var(--mut);border:1px solid var(--line);border-radius:7px;padding:2px 7px}
+ .row{display:flex;gap:8px;align-items:center}
+ .spacer{flex:1}
+ button{padding:8px 13px;border:0;border-radius:9px;background:var(--acc);color:#fff;font-weight:600;cursor:pointer}
+ button.ghost{background:transparent;border:1px solid var(--line);color:var(--fg)}
+ button.danger{background:transparent;border:1px solid var(--err);color:var(--err)}
+ button:disabled{opacity:.45;cursor:not-allowed}
+ label{display:block;font-size:12px;color:var(--mut);margin:10px 0 4px}
+ select,input{width:100%;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--bg2);color:var(--fg)}
+ .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+ .form-grid.three{grid-template-columns:repeat(3,1fr)}
+ canvas{width:100%;height:240px;background:var(--bg2);border-radius:9px;border:1px solid var(--line)}
+ .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+ .kpi{background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:11px}
+ .kpi .v{font-size:21px;font-weight:800;color:var(--ok)} .kpi .k{font-size:11px;color:var(--mut)}
+ table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
+ th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}
+ th{color:var(--mut);font-weight:600}
+ .headline{font-size:26px;font-weight:800;color:var(--acc)}
+ #status{font-size:13px;color:var(--mut);min-height:18px;margin-top:8px}
+ .note{font-size:12px;color:var(--warn)}
+ .legend{font-size:12px;color:var(--mut)} .legend b{color:var(--acc)} .legend i{color:var(--ok);font-style:normal}
+ .muted{color:var(--mut);font-size:12px}
+ a{color:var(--acc)}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo"></div>
+  <div>
+    <h1>GaussRDL</h1>
+    <div class="sub">Relational Deep Learning research suite · Gaussian Technologies</div>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" id="tab-ds" onclick="showTab('ds')">Datasets</div>
+  <div class="tab" id="tab-bench" onclick="showTab('bench')">Benchmark</div>
+</div>
+
+<main>
+  <!-- DATASETS -->
+  <section class="panel active" id="panel-ds">
+    <div class="card">
+      <div class="row">
+        <b>Benchmark dataset catalog</b>
+        <span class="spacer"></span>
+        <button class="ghost" onclick="loadDatasets()">↻ Refresh</button>
+      </div>
+      <div class="muted" id="cachedir" style="margin-top:6px"></div>
+      <div class="grid ds-grid" id="ds-list" style="margin-top:14px"></div>
+    </div>
+  </section>
+
+  <!-- BENCHMARK -->
+  <section class="panel" id="panel-bench">
+    <div class="grid" style="grid-template-columns:340px 1fr">
+      <div class="card">
+        <b>Configure benchmark</b>
+        <label>Dataset</label>
+        <select id="b_dataset" onchange="onDatasetChange()"></select>
+        <div class="note" id="b_dsnote"></div>
+        <label>Task</label>
+        <select id="b_task"></select>
+        <label>Model</label>
+        <select id="b_model">
+          <option>HeteroSAGE</option><option>RGCN</option><option>GAT</option><option selected>RelGT</option>
+        </select>
+        <div class="form-grid">
+          <div><label>Hidden dim</label><input id="b_hidden" type="number" value="64" step="8"></div>
+          <div><label>Heads</label><input id="b_heads" type="number" value="4"></div>
+          <div><label>Layers</label><input id="b_layers" type="number" value="2"></div>
+          <div><label>Dropout</label><input id="b_dropout" type="number" value="0.1" step="0.05"></div>
+          <div><label>Epochs</label><input id="b_epochs" type="number" value="40"></div>
+          <div><label>Seeds</label><input id="b_seeds" type="number" value="3" min="1" max="5"></div>
+        </div>
+        <button id="b_run" onclick="runBench()" style="margin-top:14px;width:100%">Run benchmark</button>
+        <div id="status"></div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="row"><b>Result</b><span class="spacer"></span><span id="b_headline" class="headline"></span></div>
+          <div class="muted" id="b_subhead"></div>
+          <div class="legend" style="margin-top:8px">curves: <b>train loss</b> · <i>validation metric</i></div>
+          <canvas id="chart" width="900" height="240"></canvas>
+          <div class="kpis" id="b_kpis"></div>
+          <table id="b_seeds_tbl" style="display:none"><thead><tr><th>seed</th><th>val</th><th>test</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+let CATALOG = [];
+
+function showTab(t){
+  document.getElementById('tab-ds').classList.toggle('active', t==='ds');
+  document.getElementById('tab-bench').classList.toggle('active', t==='bench');
+  document.getElementById('panel-ds').classList.toggle('active', t==='ds');
+  document.getElementById('panel-bench').classList.toggle('active', t==='bench');
+}
+function fmtBytes(b){ if(!b) return '—'; const u=['B','KB','MB','GB']; let i=0; while(b>=1024&&i<u.length-1){b/=1024;i++;} return b.toFixed(1)+' '+u[i]; }
+
+async function loadDatasets(){
+  const r = await fetch('/api/datasets'); const d = await r.json();
+  CATALOG = d.datasets;
+  document.getElementById('cachedir').textContent = 'cache: '+d.cache_dir;
+  const host = document.getElementById('ds-list'); host.innerHTML='';
+  for(const ds of d.datasets){
+    const stClass = ds.status==='ready'?'b-ready':(ds.status==='error'?'b-err':'b-no');
+    const stText = ds.status==='ready'?'ready':(ds.status==='error'?'error':'not downloaded');
+    const kind = ds.official?'<span class="badge b-official">RelBench</span>':'<span class="badge b-prepared">prepared</span>';
+    const tasks = ds.tasks.map(t=>`<span class="chip" title="${t.description}">${t.name} · ${t.metric}${t.runnable?'':' (needs upstream)'}</span>`).join('');
+    const dlLabel = ds.offline_capable ? 'Download' : 'Download (needs network)';
+    const el = document.createElement('div'); el.className='ds';
+    el.innerHTML = `
+      <div class="row"><h3>${ds.display_name}</h3><span class="spacer"></span>${kind}</div>
+      <div class="meta">${ds.domain} · ${ds.approx_size} · <span class="badge ${stClass}">${stText}</span> ${ds.status==='ready'?'· '+fmtBytes(ds.size_bytes):''}</div>
+      <div class="desc">${ds.description}</div>
+      <div class="chips">${tasks}</div>
+      <div class="row" style="margin-top:6px">
+        <button data-id="${ds.id}" class="dl" ${ds.status==='ready'?'disabled':''}>${dlLabel}</button>
+        <button data-id="${ds.id}" class="rm danger" ${ds.status==='ready'?'':'disabled'}>Delete</button>
+        <span class="spacer"></span>
+        <span class="muted" title="${ds.citation}">cite ⓘ</span>
+      </div>`;
+    host.appendChild(el);
+  }
+  host.querySelectorAll('button.dl').forEach(b=>b.onclick=()=>download(b.dataset?b.dataset:b.getAttribute('data-id')));
+  host.querySelectorAll('button.rm').forEach(b=>b.onclick=()=>del(b.getAttribute('data-id')));
+  populateDatasetSelect();
+}
+
+async function download(id){
+  const btns=document.querySelectorAll('button'); btns.forEach(b=>b.disabled=true);
+  try{
+    const r=await fetch('/api/datasets/download',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+    const d=await r.json();
+    if(d.error||d.status==='error') alert('Download failed: '+(d.error||'unknown'));
+  }catch(e){ alert('Download error: '+e); }
+  await loadDatasets();
+}
+async function del(id){
+  await fetch('/api/datasets/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+  await loadDatasets();
+}
+
+function populateDatasetSelect(){
+  const sel=document.getElementById('b_dataset'); const prev=sel.value; sel.innerHTML='';
+  for(const ds of CATALOG){
+    const o=document.createElement('option'); o.value=ds.id;
+    o.textContent=`${ds.display_name} ${ds.status==='ready'?'✓':'(not downloaded)'}`;
+    sel.appendChild(o);
+  }
+  if(prev) sel.value=prev;
+  onDatasetChange();
+}
+function onDatasetChange(){
+  const id=document.getElementById('b_dataset').value;
+  const ds=CATALOG.find(d=>d.id===id); const tsel=document.getElementById('b_task'); tsel.innerHTML='';
+  const note=document.getElementById('b_dsnote');
+  if(!ds){return;}
+  for(const t of ds.tasks){
+    const o=document.createElement('option'); o.value=t.name; o.textContent=`${t.name} · ${t.metric}`;
+    if(!t.runnable) o.disabled=true; tsel.appendChild(o);
+  }
+  if(ds.status!=='ready'){ note.textContent = ds.offline_capable
+    ? 'Not downloaded — it will be prepared automatically when you run.'
+    : 'Official RelBench dataset — requires network access to the source host.'; }
+  else note.textContent='';
+}
+
+function drawLine(ctx,W,H,arr,color,pad){
+  if(arr.length<2)return; const mn=Math.min(...arr),mx=Math.max(...arr);
+  ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();
+  for(let i=0;i<arr.length;i++){const x=pad+(W-2*pad)*i/(arr.length-1);
+    const y=H-pad-(H-2*pad)*(arr[i]-mn)/((mx-mn)||1); i?ctx.lineTo(x,y):ctx.moveTo(x,y);} ctx.stroke();
+}
+function drawChart(hist){
+  const c=document.getElementById('chart'),ctx=c.getContext('2d'),W=c.width,H=c.height,pad=24;
+  ctx.clearRect(0,0,W,H);
+  drawLine(ctx,W,H,hist.map(e=>e.train_loss),'#5b8cff',pad);
+  drawLine(ctx,W,H,hist.map(e=>e.val_metric),'#37d39b',pad);
+}
+function kpi(k,v){return `<div class="kpi"><div class="v">${v}</div><div class="k">${k}</div></div>`}
+
+async function runBench(){
+  const btn=document.getElementById('b_run'); btn.disabled=true;
+  document.getElementById('status').textContent='Running benchmark (training across seeds)…';
+  const body={dataset:document.getElementById('b_dataset').value,task:document.getElementById('b_task').value,
+    model:document.getElementById('b_model').value,hidden_dim:+document.getElementById('b_hidden').value,
+    num_heads:+document.getElementById('b_heads').value,num_layers:+document.getElementById('b_layers').value,
+    dropout:+document.getElementById('b_dropout').value,epochs:+document.getElementById('b_epochs').value,
+    seeds:+document.getElementById('b_seeds').value};
+  try{
+    const r=await fetch('/api/benchmark',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json();
+    if(d.error){document.getElementById('status').textContent='Error: '+d.error; btn.disabled=false; return;}
+    document.getElementById('b_headline').textContent=`${d.test_mean.toFixed(4)} ± ${d.test_std.toFixed(4)} ${d.metric_name}`;
+    document.getElementById('b_subhead').textContent=
+      `${d.model} on ${d.dataset}/${d.task} · ${d.num_nodes} nodes / ${d.num_edges} edges / ${d.num_relations} relations · ${d.higher_is_better?'higher':'lower'} is better`;
+    drawChart(d.history.epochs);
+    const inf=d.inference; let html='';
+    html+=kpi('test '+d.metric_name, d.test_mean.toFixed(4));
+    html+=kpi('val '+d.metric_name, d.val_mean.toFixed(4));
+    html+=kpi('std (seeds)', d.test_std.toFixed(4));
+    html+=kpi('throughput/s', Math.round(inf.throughput_per_s));
+    if(d.metric_name==='ROC-AUC'){ html+=kpi('accuracy',inf.accuracy.toFixed(4)); html+=kpi('Brier',inf.brier.toFixed(4)); }
+    else { html+=kpi('RMSE',inf.rmse.toFixed(2)); html+=kpi('R²',inf.r2.toFixed(3)); }
+    html+=kpi('latency ms',inf.latency_ms.toFixed(1));
+    html+=kpi('epochs',d.history.epochs.length);
+    document.getElementById('b_kpis').innerHTML=html;
+    const tb=document.getElementById('b_seeds_tbl'); tb.style.display='table';
+    tb.querySelector('tbody').innerHTML=d.seeds.map(s=>`<tr><td>${s.seed}</td><td>${s.val.toFixed(4)}</td><td>${s.test.toFixed(4)}</td></tr>`).join('');
+    document.getElementById('status').textContent='Done.';
+  }catch(e){document.getElementById('status').textContent='Error: '+e;}
+  btn.disabled=false;
+}
+
+loadDatasets();
+</script>
+</body>
+</html>

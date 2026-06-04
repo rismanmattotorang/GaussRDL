@@ -8,6 +8,7 @@ description = "Web UI for the GaussRDL v2 engine: configure models, launch train
 
 [dependencies]
 gaussrdl-rdl = { path = "../gaussrdl-rdl" }
+gaussrdl-bench = { path = "../gaussrdl-bench" }
 axum = { workspace = true }
 tokio = { workspace = true }
 serde = { workspace = true }
