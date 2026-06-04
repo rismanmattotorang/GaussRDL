@@ -9,7 +9,7 @@ use crate::mp::{edge_softmax, scatter_sum};
 use candle_core::Tensor;
 use candle_nn::{linear, Linear, Module, VarBuilder};
 
-use super::{param, ModelConfig, NodeEncoder};
+use super::{maybe_dropout, param, ModelConfig, NodeEncoder};
 
 struct GatLayer {
     w: Linear,
@@ -63,6 +63,7 @@ pub struct Gat {
     input: Linear,
     layers: Vec<GatLayer>,
     hidden: usize,
+    dropout: f32,
 }
 
 impl Gat {
@@ -72,15 +73,16 @@ impl Gat {
         for l in 0..cfg.num_layers {
             layers.push(GatLayer::new(cfg.hidden_dim, cfg.num_heads, vb.pp(format!("layer{l}")))?);
         }
-        Ok(Self { input, layers, hidden: cfg.hidden_dim })
+        Ok(Self { input, layers, hidden: cfg.hidden_dim, dropout: cfg.dropout })
     }
 }
 
 impl NodeEncoder for Gat {
-    fn forward(&self, x: &Tensor, g: &GraphTensors) -> Result<Tensor> {
+    fn forward(&self, x: &Tensor, g: &GraphTensors, train: bool) -> Result<Tensor> {
         let mut h = self.input.forward(x)?.relu()?;
         for layer in &self.layers {
             h = (layer.forward(&h, g)? + h)?;
+            h = maybe_dropout(&h, self.dropout, train)?;
         }
         Ok(h)
     }

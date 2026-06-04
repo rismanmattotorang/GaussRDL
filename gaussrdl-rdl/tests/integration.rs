@@ -7,7 +7,8 @@ use gaussrdl_rdl::data::{Column, ColumnData, ForeignKey, RelationalDatabase, Tab
 use gaussrdl_rdl::graph::HeteroGraph;
 use gaussrdl_rdl::models::{ModelConfig, ModelKind};
 use gaussrdl_rdl::synthetic::{SyntheticConfig, SyntheticDataset};
-use gaussrdl_rdl::{run_experiment, ExperimentConfig, TaskType};
+use gaussrdl_rdl::{run_experiment, DataSource, ExperimentConfig, TaskType};
+use std::collections::HashMap;
 
 fn small_data() -> SyntheticConfig {
     SyntheticConfig { num_users: 300, num_items: 80, seed: 1, ..Default::default() }
@@ -75,7 +76,7 @@ fn train_classification(model: ModelKind) -> gaussrdl_rdl::ExperimentResult {
         channels: 48,
         epochs: 70,
         lr: 1e-2,
-        data: small_data(),
+        data: DataSource::Synthetic(small_data()),
         ..Default::default()
     };
     run_experiment(&cfg).unwrap()
@@ -85,17 +86,17 @@ fn train_classification(model: ModelKind) -> gaussrdl_rdl::ExperimentResult {
 fn all_models_learn_churn() {
     for &model in ModelKind::all() {
         let r = train_classification(model);
-        // Loss must decrease over training.
-        let first = r.train_losses[0];
-        let last = *r.train_losses.last().unwrap();
+        let losses = r.train_losses();
+        let first = losses[0];
+        let last = *losses.last().unwrap();
         assert!(last < first, "{model:?}: loss did not decrease ({first} -> {last})");
         assert!(last.is_finite(), "{model:?}: non-finite loss");
         // Must beat random on held-out users.
-        assert!(
-            r.val.auroc > 0.6,
-            "{model:?}: val AUROC {} not above chance",
-            r.val.auroc
-        );
+        assert!(r.val.auroc > 0.6, "{model:?}: val AUROC {} not above chance", r.val.auroc);
+        // Inference KPIs are populated.
+        assert!(r.inference.num_samples > 0);
+        assert!(r.inference.throughput_per_s > 0.0);
+        assert!(r.inference.auroc > 0.5);
     }
 }
 
@@ -108,12 +109,74 @@ fn sage_learns_regression() {
         model_cfg: ModelConfig { hidden_dim: 48, num_layers: 2, ..Default::default() },
         epochs: 80,
         lr: 1e-2,
-        data: small_data(),
+        data: DataSource::Synthetic(small_data()),
         ..Default::default()
     };
     let r = run_experiment(&cfg).unwrap();
-    let first = r.train_losses[0];
-    let last = *r.train_losses.last().unwrap();
-    assert!(last < first, "regression loss did not decrease ({first} -> {last})");
+    let losses = r.train_losses();
+    assert!(*losses.last().unwrap() < losses[0], "regression loss did not decrease");
     assert!(r.test.mae.is_finite());
+    assert!(r.inference.r2.is_finite());
+}
+
+#[test]
+fn early_stopping_and_monitoring() {
+    let cfg = ExperimentConfig {
+        model: ModelKind::HeteroSAGE,
+        task: TaskType::BinaryClassification,
+        channels: 32,
+        model_cfg: ModelConfig { hidden_dim: 32, num_layers: 2, ..Default::default() },
+        epochs: 100,
+        lr: 1e-2,
+        early_stopping_patience: 8,
+        data: DataSource::Synthetic(small_data()),
+        ..Default::default()
+    };
+    // Capture live callback events.
+    let mut seen = 0usize;
+    let r = gaussrdl_rdl::run_experiment_cb(&cfg, &mut |_em| seen += 1).unwrap();
+    assert_eq!(seen, r.history.epochs.len());
+    // Every epoch records a learning rate and a finite gradient norm.
+    for e in &r.history.epochs {
+        assert!(e.learning_rate > 0.0);
+        assert!(e.grad_norm.is_finite());
+    }
+    // best_val should be the max val_metric seen (classification maximizes).
+    let best = r.history.epochs.iter().map(|e| e.val_metric).fold(f32::MIN, f32::max);
+    assert!((r.history.best_val - best).abs() < 1e-4);
+}
+
+#[test]
+fn csv_roundtrip_trains() {
+    // Generate synthetic data, write to CSV, reload, and train through the
+    // real-data CSV path.
+    let ds = SyntheticDataset::generate(small_data());
+    let dir = std::env::temp_dir().join(format!("gaussrdl_csv_{}", std::process::id()));
+    let mut labels = HashMap::new();
+    labels.insert("churn".to_string(), ds.churn_labels.clone());
+    gaussrdl_rdl::io::write_database_csv(&dir, &ds.db, "users", &labels).unwrap();
+
+    // schema.json + 3 CSVs exist.
+    assert!(dir.join("schema.json").exists());
+    let loaded = gaussrdl_rdl::io::load_database_csv(&dir).unwrap();
+    assert_eq!(loaded.db.tables.len(), ds.db.tables.len());
+    assert!(loaded.labels.contains_key("churn"));
+
+    let cfg = ExperimentConfig {
+        model: ModelKind::HeteroSAGE,
+        task: TaskType::BinaryClassification,
+        channels: 32,
+        model_cfg: ModelConfig { hidden_dim: 32, num_layers: 2, ..Default::default() },
+        epochs: 50,
+        lr: 1e-2,
+        data: DataSource::Csv {
+            dir: dir.to_string_lossy().into_owned(),
+            label: "churn".into(),
+            seed_quantile: 1.0,
+        },
+        ..Default::default()
+    };
+    let r = run_experiment(&cfg).unwrap();
+    assert!(r.val.auroc > 0.55, "csv-trained val AUROC {} too low", r.val.auroc);
+    let _ = std::fs::remove_dir_all(&dir);
 }

@@ -20,15 +20,22 @@ pub mod data;
 pub mod encoder;
 pub mod error;
 pub mod graph;
+pub mod inference;
+pub mod io;
 pub mod metrics;
 pub mod models;
 pub mod mp;
 pub mod pipeline;
 pub mod synthetic;
 pub mod task;
+pub mod train;
 
 pub use error::{RdlError, Result};
+pub use inference::InferenceReport;
 pub use models::{ModelConfig, ModelKind};
-pub use pipeline::{run_experiment, ExperimentConfig, ExperimentResult, SplitMetrics};
+pub use pipeline::{
+    run_experiment, run_experiment_cb, DataSource, ExperimentConfig, ExperimentResult, SplitMetrics,
+};
 pub use synthetic::{SyntheticConfig, SyntheticDataset};
 pub use task::TaskType;
+pub use train::{EpochMetrics, LrSchedule, TrainingHistory};

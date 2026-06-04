@@ -1,0 +1,95 @@
+{
+  "name": "synthetic-ecommerce",
+  "tables": [
+    {
+      "name": "users",
+      "file": "users.csv",
+      "time_column": "__time",
+      "columns": [
+        {
+          "name": "__id",
+          "role": "PrimaryKey"
+        },
+        {
+          "name": "age",
+          "role": "Numerical"
+        },
+        {
+          "name": "country",
+          "role": "Categorical"
+        },
+        {
+          "name": "signup",
+          "role": "Timestamp"
+        },
+        {
+          "name": "__time",
+          "role": "Timestamp"
+        },
+        {
+          "name": "ltv",
+          "role": "Label"
+        },
+        {
+          "name": "churn",
+          "role": "Label"
+        }
+      ]
+    },
+    {
+      "name": "items",
+      "file": "items.csv",
+      "time_column": "__time",
+      "columns": [
+        {
+          "name": "__id",
+          "role": "PrimaryKey"
+        },
+        {
+          "name": "price",
+          "role": "Numerical"
+        },
+        {
+          "name": "category",
+          "role": "Categorical"
+        },
+        {
+          "name": "__time",
+          "role": "Timestamp"
+        }
+      ]
+    },
+    {
+      "name": "transactions",
+      "file": "transactions.csv",
+      "time_column": "__time",
+      "columns": [
+        {
+          "name": "__id",
+          "role": "PrimaryKey"
+        },
+        {
+          "name": "user_id",
+          "role": {
+            "ForeignKey": "users"
+          }
+        },
+        {
+          "name": "item_id",
+          "role": {
+            "ForeignKey": "items"
+          }
+        },
+        {
+          "name": "amount",
+          "role": "Numerical"
+        },
+        {
+          "name": "__time",
+          "role": "Timestamp"
+        }
+      ]
+    }
+  ],
+  "seed_table": "users"
+}

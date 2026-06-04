@@ -19,7 +19,7 @@ use candle_core::Tensor;
 use candle_nn::ops::softmax;
 use candle_nn::{embedding, layer_norm, linear, Embedding, LayerNorm, Linear, Module, VarBuilder};
 
-use super::{param, ModelConfig, NodeEncoder};
+use super::{maybe_dropout, param, ModelConfig, NodeEncoder};
 
 struct RelGtLayer {
     // local attention
@@ -119,6 +119,7 @@ pub struct RelGt {
     deg_proj: Linear,
     layers: Vec<RelGtLayer>,
     hidden: usize,
+    dropout: f32,
 }
 
 impl RelGt {
@@ -139,7 +140,7 @@ impl RelGt {
         for l in 0..cfg.num_layers {
             layers.push(RelGtLayer::new(dim, heads, head_dim, cfg.num_centroids, vb.pp(format!("layer{l}")))?);
         }
-        Ok(Self { input, type_emb, time_proj, deg_proj, layers, hidden: dim })
+        Ok(Self { input, type_emb, time_proj, deg_proj, layers, hidden: dim, dropout: cfg.dropout })
     }
 
     /// Build the multi-element token for every node.
@@ -156,10 +157,11 @@ impl RelGt {
 }
 
 impl NodeEncoder for RelGt {
-    fn forward(&self, x: &Tensor, g: &GraphTensors) -> Result<Tensor> {
+    fn forward(&self, x: &Tensor, g: &GraphTensors, train: bool) -> Result<Tensor> {
         let mut h = self.tokenize(x, g)?;
         for layer in &self.layers {
             h = layer.forward(&h, g)?;
+            h = maybe_dropout(&h, self.dropout, train)?;
         }
         Ok(h)
     }

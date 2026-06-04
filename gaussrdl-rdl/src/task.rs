@@ -6,7 +6,7 @@ use candle_nn::loss::mse;
 use candle_nn::{linear, Linear, Module, VarBuilder};
 
 /// Supported predictive task types (RelBench entity-level).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum TaskType {
     /// Binary node classification (metric: ROC-AUC).
     BinaryClassification,

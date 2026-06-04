@@ -29,7 +29,7 @@ pub use relgt::RelGt;
 pub use rgcn::Rgcn;
 
 /// Which architecture to instantiate.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ModelKind {
     HeteroSAGE,
     Rgcn,
@@ -63,7 +63,7 @@ impl ModelKind {
 }
 
 /// Shared hyperparameters.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ModelConfig {
     pub hidden_dim: usize,
     pub num_layers: usize,
@@ -71,6 +71,8 @@ pub struct ModelConfig {
     pub num_bases: usize,
     /// Number of learnable global centroids (RelGT).
     pub num_centroids: usize,
+    /// Dropout probability applied between layers during training.
+    pub dropout: f32,
 }
 
 impl Default for ModelConfig {
@@ -81,6 +83,7 @@ impl Default for ModelConfig {
             num_heads: 4,
             num_bases: 4,
             num_centroids: 16,
+            dropout: 0.1,
         }
     }
 }
@@ -88,8 +91,18 @@ impl Default for ModelConfig {
 /// Common interface for node-representation models.
 pub trait NodeEncoder {
     /// Map [N, in_dim] features + graph connectivity to [N, hidden].
-    fn forward(&self, x: &Tensor, g: &GraphTensors) -> Result<Tensor>;
+    /// `train` toggles stochastic regularization (dropout).
+    fn forward(&self, x: &Tensor, g: &GraphTensors, train: bool) -> Result<Tensor>;
     fn out_dim(&self) -> usize;
+}
+
+/// Apply dropout only in training mode.
+pub(crate) fn maybe_dropout(x: &Tensor, p: f32, train: bool) -> Result<Tensor> {
+    if train && p > 0.0 {
+        Ok(candle_nn::ops::dropout(x, p)?)
+    } else {
+        Ok(x.clone())
+    }
 }
 
 /// Instantiate a model by kind.
