@@ -20,6 +20,23 @@ This repository ships a from-scratch RDL engine on the
 automatic differentiation, a model zoo spanning the current state of the art,
 and a fully tested end-to-end pipeline.
 
+### Research capabilities at Gaussian Technologies
+
+Gaussian Technologies builds deep-tech AI for **emerging research domains**, and
+RDL is a flagship. This repository demonstrates end-to-end research capability:
+
+- **Frontier literature → working code.** Faithful Rust implementations of the
+  RDL baseline, RGCN, GAT, and the 2025 **Relational Graph Transformer**, with a
+  cited survey of the field through June 2026 ([docs/RDL_SOTA.md](docs/RDL_SOTA.md))
+  and a candid per-model quality review ([docs/MODEL_REVIEW.md](docs/MODEL_REVIEW.md)).
+- **Benchmark-grade evaluation.** A dataset registry (RelBench catalog + offline
+  prepared benchmarks), a download/cache **dataset manager**, and a
+  **paper-faithful benchmark runner** that reports the correct metric per task
+  with **mean ± std over seeds** and leakage-free temporal splits.
+- **Researcher-grade tooling.** A polished **terminal UI** and **web UI** to
+  browse and manage datasets, configure models, launch training, and read live
+  curves and inference KPIs — so experiments are fast, reproducible, and legible.
+
 ---
 
 ## Why RDL, and why this matters
@@ -143,27 +160,48 @@ let cfg = ExperimentConfig {
 let result = run_experiment(&cfg)?;
 ```
 
-## Configure & monitor — TUI and Web UI
+## Benchmark datasets — download, manage, evaluate, report
 
-**Terminal UI** (`gaussrdl-tui`): pick the model, adjust hyperparameters with the
-keyboard, launch training, and watch a live loss sparkline plus per-epoch
-metrics and final KPIs.
+GaussRDL ships a **dataset catalog** and a **benchmark runner** for reproducible,
+paper-faithful evaluation.
+
+- **Catalog** (`gaussrdl-bench`): the official **RelBench** datasets (rel-f1,
+  rel-amazon, rel-hm, rel-stack, rel-trial, rel-avito, rel-event) with metadata,
+  tasks, metrics, and citations, plus **prepared** offline benchmarks that
+  materialize locally (no network) so the full flow works anywhere.
+- **Manager**: a local cache with status tracking, download/prepare, delete,
+  and integrity checks. Downloads use a streaming HTTP client (real RelBench
+  hosts must be reachable; in restricted environments a clear error is shown and
+  the prepared benchmarks remain fully usable).
+- **Runner**: trains, evaluates, and reports the **correct metric per task**
+  (ROC-AUC / MAE) as **mean ± std over seeds**, with leakage-free temporal
+  splits and validation-based selection.
+
+Both UIs expose this. The **TUI** (`gaussrdl-tui`) has a *Datasets* tab (browse,
+download/prepare, delete) and a *Benchmark* tab (configure, run, watch live
+training, read mean ± std + KPIs):
 
 ```bash
-cargo run -p gaussrdl-tui            # ↑/↓ select · ←/→ adjust · Enter train · q quit
+cargo run -p gaussrdl-tui   # Tab switch · ↑/↓ select · ←/→ adjust · d download · x delete · Enter run · q quit
 ```
 
-**Web UI** (`gaussrdl-web`): an axum server with a browser form for model
-parameters; training streams back loss / validation curves and inference KPIs.
+The **Web UI** (`gaussrdl-web`, axum) has a *Datasets* view with download/delete
+buttons and status badges, and a *Benchmark* view with live loss/validation
+curves, a per-seed table, and an inference-KPI grid:
 
 ```bash
-cargo run -p gaussrdl-web            # open http://127.0.0.1:8080
+cargo run -p gaussrdl-web   # open http://127.0.0.1:8080
 # JSON API:
-curl -s localhost:8080/api/models
-curl -s -X POST localhost:8080/api/train \
-  -H 'content-type: application/json' \
+curl -s localhost:8080/api/datasets
+curl -s -X POST localhost:8080/api/datasets/download -H 'content-type: application/json' -d '{"id":"gauss-ecom-small"}'
+curl -s -X POST localhost:8080/api/benchmark -H 'content-type: application/json' \
+  -d '{"dataset":"gauss-ecom-small","task":"user-churn","model":"relgt","hidden_dim":64,"num_layers":2,"num_heads":4,"dropout":0.1,"epochs":40,"seeds":3}'
+# Lightweight synthetic playground:
+curl -s -X POST localhost:8080/api/train -H 'content-type: application/json' \
   -d '{"model":"relgt","task":"churn","epochs":40,"hidden_dim":64,"num_layers":2,"num_heads":4,"lr":0.01,"dropout":0.1,"num_users":300}'
 ```
+
+Datasets are cached under `$GAUSSRDL_DATA` (default `~/.cache/gaussrdl/datasets`).
 
 ## Training monitoring & inference KPIs
 
@@ -226,8 +264,9 @@ migrated onto the v2 engine.
 | Crate | Role |
 |-------|------|
 | **`gaussrdl-rdl`** | **v2 engine: encoders, hetero-graph, models, training, metrics, CSV I/O (this release)** |
-| **`gaussrdl-tui`** | **Terminal UI to configure parameters and monitor training** |
-| **`gaussrdl-web`** | **Web UI (axum) to configure, train, and view metrics/KPIs** |
+| **`gaussrdl-bench`** | **Dataset catalog, download/cache manager, paper-faithful benchmark runner** |
+| **`gaussrdl-tui`** | **Terminal UI: dataset management + benchmarking with live monitoring** |
+| **`gaussrdl-web`** | **Web UI (axum): dataset management + benchmarking with live charts** |
 | `gaussrdl-core` | Foundation types, traits, errors |
 | `gaussrdl-data` | Dataset/task definitions and loaders |
 | `gaussrdl-graph` | Graph construction, sampling, and algorithms |
@@ -250,11 +289,14 @@ Grounded in the SOTA survey ([docs/RDL_SOTA.md](docs/RDL_SOTA.md)):
 - [x] Training monitoring (per-epoch metrics, LR schedule, early stopping,
       checkpoints) and inference KPIs.
 - [x] **TUI** and **Web UI** for parameter configuration and live monitoring.
+- [x] **Dataset catalog + manager** (download/prepare/delete) and a
+      **benchmark runner** (mean ± std over seeds) in both UIs.
 - [ ] **RelGNN** atomic-route composite message passing (ICML 2025) for
       many-to-many relations.
 - [ ] **ContextGNN** pair-wise + two-tower recommender for link-prediction tasks
       (MAP@k), with negative sampling.
-- [ ] Real **RelBench v1/v2** dataset loaders + **Parquet** connector.
+- [ ] Real **RelBench v1/v2** ingestion (the catalog is wired; needs the upstream
+      Parquet→schema conversion and reachable hosts) + **Parquet** connector.
 - [ ] Per-seed **temporal subgraph mini-batch sampling** for large graphs.
 - [ ] Text/multicategorical column encoders (frozen LM embeddings).
 - [ ] GPU (CUDA/Metal) execution paths via Candle.
