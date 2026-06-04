@@ -6,6 +6,7 @@ members = [
     "gaussrdl-data", 
     "gaussrdl-graph",
     "gaussrdl-models",
+    "gaussrdl-rdl",
     "gaussrdl-training",
     "gaussrdl-metrics",
     "gaussrdl-database",

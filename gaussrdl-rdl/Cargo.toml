@@ -1,0 +1,25 @@
+[package]
+name = "gaussrdl-rdl"
+version = "0.2.0"
+edition = "2021"
+authors = ["Gaussian Technologies <research@gaussian.tech>"]
+license = "MIT"
+description = "GaussRDL v2 engine: a correct, end-to-end Relational Deep Learning stack (column encoders, temporal hetero-graphs, SOTA GNN/transformer models, real autodiff training) built on Candle."
+
+[dependencies]
+candle-core = { workspace = true }
+candle-nn = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+rand = { workspace = true }
+rand_distr = { workspace = true }
+
+[[bin]]
+name = "gaussrdl-rdl"
+path = "src/bin/cli.rs"
+
+[[example]]
+name = "end_to_end"
+path = "examples/end_to_end.rs"
