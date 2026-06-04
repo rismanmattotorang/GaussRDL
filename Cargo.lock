@@ -1714,6 +1714,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "gaussrdl-rdl"
+version = "0.2.0"
+dependencies = [
+ "anyhow",
+ "candle-core",
+ "candle-nn",
+ "rand 0.8.5",
+ "rand_distr 0.4.3",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
 name = "gaussrdl-server"
 version = "0.1.0"
 dependencies = [
