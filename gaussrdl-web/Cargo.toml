@@ -1,0 +1,18 @@
+[package]
+name = "gaussrdl-web"
+version = "0.2.0"
+edition = "2021"
+authors = ["Gaussian Technologies <research@gaussian.tech>"]
+license = "MIT"
+description = "Web UI for the GaussRDL v2 engine: configure models, launch training, and monitor metrics from the browser."
+
+[dependencies]
+gaussrdl-rdl = { path = "../gaussrdl-rdl" }
+axum = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[[bin]]
+name = "gaussrdl-web"
+path = "src/main.rs"

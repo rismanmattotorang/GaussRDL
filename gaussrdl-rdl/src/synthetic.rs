@@ -14,7 +14,7 @@ use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
 /// Configuration for the synthetic generator.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SyntheticConfig {
     pub num_users: usize,
     pub num_items: usize,

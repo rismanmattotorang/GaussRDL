@@ -10,7 +10,7 @@ use crate::mp::{gather_rows, relation_edge_mask, scatter_mean};
 use candle_core::{Tensor, D};
 use candle_nn::{linear, Linear, Module, VarBuilder};
 
-use super::{param, ModelConfig, NodeEncoder};
+use super::{maybe_dropout, param, ModelConfig, NodeEncoder};
 
 struct RgcnLayer {
     self_w: Linear,
@@ -63,6 +63,7 @@ pub struct Rgcn {
     input: Linear,
     layers: Vec<RgcnLayer>,
     hidden: usize,
+    dropout: f32,
 }
 
 impl Rgcn {
@@ -82,18 +83,18 @@ impl Rgcn {
                 vb.pp(format!("layer{l}")),
             )?);
         }
-        Ok(Self { input, layers, hidden: cfg.hidden_dim })
+        Ok(Self { input, layers, hidden: cfg.hidden_dim, dropout: cfg.dropout })
     }
 }
 
 impl NodeEncoder for Rgcn {
-    fn forward(&self, x: &Tensor, g: &GraphTensors) -> Result<Tensor> {
+    fn forward(&self, x: &Tensor, g: &GraphTensors, train: bool) -> Result<Tensor> {
+        let _ = D::Minus1;
         let mut h = self.input.forward(x)?.relu()?;
         for layer in &self.layers {
             h = (layer.forward(&h, g)? + h)?;
+            h = maybe_dropout(&h, self.dropout, train)?;
         }
-        // Touch D import for clarity of last-dim ops in future extensions.
-        let _ = D::Minus1;
         Ok(h)
     }
 

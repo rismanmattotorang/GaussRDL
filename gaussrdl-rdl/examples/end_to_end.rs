@@ -3,7 +3,7 @@
 
 use gaussrdl_rdl::models::{ModelConfig, ModelKind};
 use gaussrdl_rdl::synthetic::SyntheticConfig;
-use gaussrdl_rdl::{run_experiment, ExperimentConfig, TaskType};
+use gaussrdl_rdl::{run_experiment, DataSource, ExperimentConfig, TaskType};
 
 fn main() -> gaussrdl_rdl::Result<()> {
     println!("GaussRDL v2 — end-to-end Relational Deep Learning demo\n");
@@ -16,7 +16,7 @@ fn main() -> gaussrdl_rdl::Result<()> {
             channels: 64,
             epochs: 80,
             lr: 1e-2,
-            data: SyntheticConfig::default(),
+            data: DataSource::Synthetic(SyntheticConfig::default()),
             ..Default::default()
         };
         let r = run_experiment(&cfg)?;

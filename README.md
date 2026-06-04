@@ -117,6 +117,71 @@ To plug in **your own** database, construct a `RelationalDatabase` with
 
 ---
 
+## Working with real data (CSV)
+
+Point GaussRDL at a directory of CSV files described by a `schema.json` (one
+entry per table, each column tagged `numerical` / `categorical` / `timestamp` /
+`primary_key` / `foreign_key` / `label`). Foreign keys are resolved to row
+indices, categoricals are interned, and timestamps parse from epoch seconds or
+`YYYY-MM-DD`. The seed time defaults to a configurable quantile of observed
+event times, and only edges with `time ≤ seed_time` are used (no leakage).
+
+```bash
+# Generate a real CSV database (users.csv, items.csv, transactions.csv + schema.json)
+cargo run -p gaussrdl-rdl --bin gaussrdl-rdl -- make-sample data/sample
+
+# Train directly from those CSV files
+cargo run -p gaussrdl-rdl --bin gaussrdl-rdl -- csv data/sample churn relgt churn 80
+```
+
+```rust
+use gaussrdl_rdl::{run_experiment, DataSource, ExperimentConfig};
+let cfg = ExperimentConfig {
+    data: DataSource::Csv { dir: "data/sample".into(), label: "churn".into(), seed_quantile: 1.0 },
+    ..Default::default()
+};
+let result = run_experiment(&cfg)?;
+```
+
+## Configure & monitor — TUI and Web UI
+
+**Terminal UI** (`gaussrdl-tui`): pick the model, adjust hyperparameters with the
+keyboard, launch training, and watch a live loss sparkline plus per-epoch
+metrics and final KPIs.
+
+```bash
+cargo run -p gaussrdl-tui            # ↑/↓ select · ←/→ adjust · Enter train · q quit
+```
+
+**Web UI** (`gaussrdl-web`): an axum server with a browser form for model
+parameters; training streams back loss / validation curves and inference KPIs.
+
+```bash
+cargo run -p gaussrdl-web            # open http://127.0.0.1:8080
+# JSON API:
+curl -s localhost:8080/api/models
+curl -s -X POST localhost:8080/api/train \
+  -H 'content-type: application/json' \
+  -d '{"model":"relgt","task":"churn","epochs":40,"hidden_dim":64,"num_layers":2,"num_heads":4,"lr":0.01,"dropout":0.1,"num_users":300}'
+```
+
+## Training monitoring & inference KPIs
+
+Every run records a **per-epoch history**: train loss, validation metric,
+learning rate (cosine / warmup-cosine schedule), **gradient norm**, and epoch
+time — plus **early stopping** with best-checkpoint restore and VarMap
+checkpoint save/load. The held-out test set produces an **inference report**:
+
+- *Performance:* latency (ms) and throughput (predictions/sec).
+- *Accuracy (classification):* ROC-AUC, accuracy, Brier score, positive rate.
+- *Accuracy (regression):* MAE, RMSE, R².
+
+These are exposed on `ExperimentResult` (`history`, `inference`) and surfaced
+live in the TUI and Web UI. A model-quality assessment is in
+[docs/MODEL_REVIEW.md](docs/MODEL_REVIEW.md).
+
+---
+
 ## Reproducible results
 
 Real output of `cargo run -p gaussrdl-rdl -- benchmark` on the bundled
@@ -160,7 +225,9 @@ migrated onto the v2 engine.
 
 | Crate | Role |
 |-------|------|
-| **`gaussrdl-rdl`** | **v2 engine: encoders, hetero-graph, models, training, metrics (this release)** |
+| **`gaussrdl-rdl`** | **v2 engine: encoders, hetero-graph, models, training, metrics, CSV I/O (this release)** |
+| **`gaussrdl-tui`** | **Terminal UI to configure parameters and monitor training** |
+| **`gaussrdl-web`** | **Web UI (axum) to configure, train, and view metrics/KPIs** |
 | `gaussrdl-core` | Foundation types, traits, errors |
 | `gaussrdl-data` | Dataset/task definitions and loaders |
 | `gaussrdl-graph` | Graph construction, sampling, and algorithms |
@@ -179,11 +246,15 @@ migrated onto the v2 engine.
 
 Grounded in the SOTA survey ([docs/RDL_SOTA.md](docs/RDL_SOTA.md)):
 
+- [x] Real-data ingestion via **CSV + schema** with FK resolution.
+- [x] Training monitoring (per-epoch metrics, LR schedule, early stopping,
+      checkpoints) and inference KPIs.
+- [x] **TUI** and **Web UI** for parameter configuration and live monitoring.
 - [ ] **RelGNN** atomic-route composite message passing (ICML 2025) for
       many-to-many relations.
 - [ ] **ContextGNN** pair-wise + two-tower recommender for link-prediction tasks
       (MAP@k), with negative sampling.
-- [ ] Real **RelBench v1/v2** dataset loaders (rel-f1, rel-amazon, rel-hm, …).
+- [ ] Real **RelBench v1/v2** dataset loaders + **Parquet** connector.
 - [ ] Per-seed **temporal subgraph mini-batch sampling** for large graphs.
 - [ ] Text/multicategorical column encoders (frozen LM embeddings).
 - [ ] GPU (CUDA/Metal) execution paths via Candle.

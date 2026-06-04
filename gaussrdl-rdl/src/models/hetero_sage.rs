@@ -10,7 +10,7 @@ use crate::mp::{gather_rows, relation_edge_mask, scatter_mean};
 use candle_nn::{linear, Linear, Module, VarBuilder};
 use candle_core::Tensor;
 
-use super::{ModelConfig, NodeEncoder};
+use super::{maybe_dropout, ModelConfig, NodeEncoder};
 
 struct SageLayer {
     self_w: Linear,
@@ -47,6 +47,7 @@ pub struct HeteroSAGE {
     input: Linear,
     layers: Vec<SageLayer>,
     hidden: usize,
+    dropout: f32,
 }
 
 impl HeteroSAGE {
@@ -61,16 +62,17 @@ impl HeteroSAGE {
         for l in 0..cfg.num_layers {
             layers.push(SageLayer::new(cfg.hidden_dim, num_relations, vb.pp(format!("layer{l}")))?);
         }
-        Ok(Self { input, layers, hidden: cfg.hidden_dim })
+        Ok(Self { input, layers, hidden: cfg.hidden_dim, dropout: cfg.dropout })
     }
 }
 
 impl NodeEncoder for HeteroSAGE {
-    fn forward(&self, x: &Tensor, g: &GraphTensors) -> Result<Tensor> {
+    fn forward(&self, x: &Tensor, g: &GraphTensors, train: bool) -> Result<Tensor> {
         let mut h = self.input.forward(x)?.relu()?;
         for layer in &self.layers {
             // Residual connection for stable deep stacks.
             h = (layer.forward(&h, g)? + h)?;
+            h = maybe_dropout(&h, self.dropout, train)?;
         }
         Ok(h)
     }
