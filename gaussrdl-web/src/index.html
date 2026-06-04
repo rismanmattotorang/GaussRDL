@@ -6,181 +6,311 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
  :root{
-   --bg:#0a0e1a;--bg2:#0e1430;--card:#141c33;--line:#243056;--fg:#e9edf8;
-   --mut:#8ea0c8;--acc:#5b8cff;--acc2:#8a6bff;--ok:#37d39b;--warn:#ffb454;--err:#ff6b81;
+   --bg:#070b15;--bg2:#0d1326;--card:#111a31;--elev:#16203b;
+   --line:#22304f;--line2:#2c3c63;--fg:#eef2fb;--fg2:#c3cdea;--mut:#8493b8;
+   --acc:#6c8cff;--acc2:#a07bff;--ok:#36d39b;--okd:#1f8f6a;--warn:#ffb454;--err:#ff6b81;
+   --shadow:0 10px 30px rgba(0,0,0,.35);--r:14px;
  }
  *{box-sizing:border-box}
- body{margin:0;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-   background:radial-gradient(1200px 600px at 80% -10%,#15224a 0,var(--bg) 55%);color:var(--fg);min-height:100vh}
- header{display:flex;align-items:center;gap:14px;padding:18px 28px;border-bottom:1px solid var(--line)}
- .logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--acc),var(--acc2));
-   box-shadow:0 0 22px rgba(91,140,255,.5)}
- h1{font-size:19px;margin:0;letter-spacing:.2px}
- .sub{color:var(--mut);font-size:13px}
- .tabs{display:flex;gap:6px;padding:14px 28px 0}
- .tab{padding:9px 16px;border-radius:9px 9px 0 0;background:transparent;color:var(--mut);
-   border:1px solid transparent;cursor:pointer;font-weight:600}
- .tab.active{background:var(--card);color:var(--fg);border-color:var(--line);border-bottom-color:var(--card)}
- main{padding:0 28px 40px}
- .panel{display:none} .panel.active{display:block}
- .card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:16px}
- .grid{display:grid;gap:14px}
- .ds-grid{grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}
- .ds{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:15px;display:flex;flex-direction:column;gap:8px}
- .ds h3{margin:0;font-size:15px} .ds .meta{color:var(--mut);font-size:12px}
- .ds .desc{font-size:13px;color:#c4cdea;min-height:38px}
- .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700}
- .b-ready{background:rgba(55,211,155,.16);color:var(--ok)}
- .b-no{background:rgba(142,160,200,.16);color:var(--mut)}
- .b-err{background:rgba(255,107,129,.16);color:var(--err)}
- .b-official{background:rgba(138,107,255,.18);color:#b9a6ff}
- .b-prepared{background:rgba(91,140,255,.16);color:var(--acc)}
- .chips{display:flex;flex-wrap:wrap;gap:6px}
- .chip{font-size:11px;color:var(--mut);border:1px solid var(--line);border-radius:7px;padding:2px 7px}
- .row{display:flex;gap:8px;align-items:center}
- .spacer{flex:1}
- button{padding:8px 13px;border:0;border-radius:9px;background:var(--acc);color:#fff;font-weight:600;cursor:pointer}
- button.ghost{background:transparent;border:1px solid var(--line);color:var(--fg)}
- button.danger{background:transparent;border:1px solid var(--err);color:var(--err)}
- button:disabled{opacity:.45;cursor:not-allowed}
- label{display:block;font-size:12px;color:var(--mut);margin:10px 0 4px}
- select,input{width:100%;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--bg2);color:var(--fg)}
- .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
- .form-grid.three{grid-template-columns:repeat(3,1fr)}
- canvas{width:100%;height:240px;background:var(--bg2);border-radius:9px;border:1px solid var(--line)}
- .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
- .kpi{background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:11px}
- .kpi .v{font-size:21px;font-weight:800;color:var(--ok)} .kpi .k{font-size:11px;color:var(--mut)}
- table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
- th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}
- th{color:var(--mut);font-weight:600}
- .headline{font-size:26px;font-weight:800;color:var(--acc)}
- #status{font-size:13px;color:var(--mut);min-height:18px;margin-top:8px}
- .note{font-size:12px;color:var(--warn)}
- .legend{font-size:12px;color:var(--mut)} .legend b{color:var(--acc)} .legend i{color:var(--ok);font-style:normal}
+ html{scroll-behavior:smooth}
+ body{margin:0;font-family:'Inter',ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+   background:
+     radial-gradient(900px 480px at 88% -8%,rgba(108,140,255,.16),transparent 60%),
+     radial-gradient(700px 420px at 8% 0%,rgba(160,123,255,.12),transparent 55%),
+     var(--bg);
+   color:var(--fg);min-height:100vh;font-feature-settings:"tnum" 1,"cv01" 1;-webkit-font-smoothing:antialiased}
+ .num{font-variant-numeric:tabular-nums}
+ a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+
+ header{display:flex;align-items:center;gap:14px;padding:16px 30px;border-bottom:1px solid var(--line);
+   position:sticky;top:0;z-index:20;backdrop-filter:blur(8px);background:rgba(7,11,21,.72)}
+ .logo{width:34px;height:34px;border-radius:10px;position:relative;
+   background:conic-gradient(from 210deg,var(--acc),var(--acc2),var(--ok),var(--acc));
+   box-shadow:0 0 26px rgba(108,140,255,.55)}
+ .logo::after{content:"";position:absolute;inset:6px;border-radius:6px;background:var(--bg)}
+ h1{font-size:18px;margin:0;letter-spacing:.3px;font-weight:800}
+ .sub{color:var(--mut);font-size:12.5px}
+ .hspacer{flex:1}
+ .ghosticon{color:var(--mut);font-size:13px;border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+
+ .tabs{display:flex;gap:4px;padding:16px 30px 0}
+ .tab{padding:10px 18px;border-radius:11px 11px 0 0;background:transparent;color:var(--mut);
+   border:1px solid transparent;border-bottom:none;cursor:pointer;font-weight:600;font-size:14px;transition:.15s}
+ .tab:hover{color:var(--fg2)}
+ .tab.active{background:var(--card);color:var(--fg);border-color:var(--line)}
+ main{padding:0 30px 60px;max-width:1500px;margin:0 auto}
+
+ .card{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);
+   border-radius:var(--r);padding:20px;margin-top:18px;box-shadow:var(--shadow)}
+ .card.tabtop{border-top-left-radius:0}
+ .card h2{font-size:15px;margin:0;font-weight:700}
+ .row{display:flex;gap:10px;align-items:center} .spacer{flex:1}
  .muted{color:var(--mut);font-size:12px}
- a{color:var(--acc)}
+ .hint{color:var(--mut);font-size:12.5px;line-height:1.5}
+
+ .grid{display:grid;gap:16px}
+ .ds-grid{grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}
+ .bench-grid{grid-template-columns:360px 1fr}
+ @media(max-width:900px){.bench-grid{grid-template-columns:1fr}}
+
+ .ds{background:linear-gradient(180deg,var(--elev),var(--card));border:1px solid var(--line);
+   border-radius:13px;padding:16px;display:flex;flex-direction:column;gap:9px;transition:.18s}
+ .ds:hover{border-color:var(--line2);transform:translateY(-2px);box-shadow:0 14px 30px rgba(0,0,0,.4)}
+ .ds h3{margin:0;font-size:14.5px;font-weight:700}
+ .ds .desc{font-size:12.7px;color:var(--fg2);min-height:36px;line-height:1.45}
+ .meta{color:var(--mut);font-size:11.5px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+
+ .badge{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;padding:3px 9px;border-radius:999px;font-weight:700;letter-spacing:.2px}
+ .dot{width:6px;height:6px;border-radius:50%}
+ .b-ready{background:rgba(54,211,155,.14);color:var(--ok)} .b-ready .dot{background:var(--ok)}
+ .b-no{background:rgba(132,147,184,.14);color:var(--mut)} .b-no .dot{background:var(--mut)}
+ .b-err{background:rgba(255,107,129,.15);color:var(--err)} .b-err .dot{background:var(--err)}
+ .b-official{background:rgba(160,123,255,.16);color:#bba6ff}
+ .b-prepared{background:rgba(108,140,255,.15);color:var(--acc)}
+ .chips{display:flex;flex-wrap:wrap;gap:6px}
+ .chip{font-size:10.8px;color:var(--fg2);border:1px solid var(--line);border-radius:7px;padding:3px 8px;background:rgba(255,255,255,.02)}
+ .chip.off{color:var(--mut);opacity:.7}
+
+ label{display:block;font-size:11.5px;color:var(--mut);margin:12px 0 5px;font-weight:600;letter-spacing:.2px}
+ select,input{width:100%;padding:9px 10px;border-radius:9px;border:1px solid var(--line);background:var(--bg2);color:var(--fg);font-size:13px;transition:.15s}
+ select:focus,input:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px rgba(108,140,255,.18)}
+ .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+
+ button{padding:9px 14px;border:0;border-radius:10px;background:linear-gradient(180deg,var(--acc),#5577f0);
+   color:#fff;font-weight:700;font-size:13px;cursor:pointer;transition:.15s;box-shadow:0 6px 16px rgba(108,140,255,.25)}
+ button:hover{filter:brightness(1.07);transform:translateY(-1px)}
+ button:active{transform:translateY(0)}
+ button.ghost{background:transparent;border:1px solid var(--line);color:var(--fg);box-shadow:none}
+ button.ghost:hover{border-color:var(--line2);background:rgba(255,255,255,.03)}
+ button.danger{background:transparent;border:1px solid rgba(255,107,129,.5);color:var(--err);box-shadow:none}
+ button.danger:hover{background:rgba(255,107,129,.1)}
+ button.sm{padding:6px 10px;font-size:12px}
+ button:disabled{opacity:.45;cursor:not-allowed;transform:none;filter:none}
+ button:focus-visible,select:focus-visible,.tab:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+
+ .spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.25);
+   border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px}
+ @keyframes spin{to{transform:rotate(360deg)}}
+
+ .chartwrap{position:relative;margin-top:12px}
+ canvas{width:100%;height:280px;display:block;background:linear-gradient(180deg,#0a1124,var(--bg2));
+   border-radius:11px;border:1px solid var(--line)}
+ #tooltip{position:absolute;pointer-events:none;background:rgba(8,13,28,.95);border:1px solid var(--line2);
+   border-radius:8px;padding:7px 9px;font-size:11.5px;display:none;box-shadow:var(--shadow);white-space:nowrap}
+ .legend{display:flex;gap:16px;font-size:12px;color:var(--mut);margin:4px 2px 0}
+ .legend .k{display:inline-flex;align-items:center;gap:6px}
+ .legend .sw{width:14px;height:3px;border-radius:2px}
+
+ .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-top:14px}
+ @media(max-width:1100px){.kpis{grid-template-columns:repeat(2,1fr)}}
+ .kpi{background:linear-gradient(180deg,var(--elev),var(--card));border:1px solid var(--line);border-radius:11px;padding:13px}
+ .kpi .v{font-size:22px;font-weight:800;color:var(--ok);line-height:1.1}
+ .kpi .k{font-size:11px;color:var(--mut);margin-top:3px}
+
+ table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:12px}
+ th,td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line)}
+ th{color:var(--mut);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+ tbody tr:hover{background:rgba(255,255,255,.02)}
+ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+ tr.best td{color:var(--ok);font-weight:700}
+
+ .headline{font-size:30px;font-weight:800;letter-spacing:-.5px;
+   background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+ .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+   color:var(--mut);padding:46px 10px;text-align:center}
+ .empty .big{font-size:30px;opacity:.5}
+
+ #toasts{position:fixed;top:16px;right:16px;display:flex;flex-direction:column;gap:9px;z-index:50}
+ .toast{background:linear-gradient(180deg,var(--elev),var(--card));border:1px solid var(--line2);border-left-width:3px;
+   border-radius:10px;padding:11px 14px;font-size:13px;box-shadow:var(--shadow);min-width:230px;animation:slidein .25s ease}
+ .toast.ok{border-left-color:var(--ok)} .toast.err{border-left-color:var(--err)} .toast.info{border-left-color:var(--acc)}
+ @keyframes slidein{from{transform:translateX(20px);opacity:0}to{transform:none;opacity:1}}
+ footer{padding:22px 30px;border-top:1px solid var(--line);color:var(--mut);font-size:12px;margin-top:30px;display:flex;gap:16px;flex-wrap:wrap}
 </style>
 </head>
 <body>
+<div id="toasts"></div>
 <header>
   <div class="logo"></div>
   <div>
     <h1>GaussRDL</h1>
     <div class="sub">Relational Deep Learning research suite · Gaussian Technologies</div>
   </div>
+  <span class="hspacer"></span>
+  <span class="ghosticon num" id="cachedir" title="local dataset cache"></span>
 </header>
 
-<div class="tabs">
-  <div class="tab active" id="tab-ds" onclick="showTab('ds')">Datasets</div>
-  <div class="tab" id="tab-bench" onclick="showTab('bench')">Benchmark</div>
+<div class="tabs" role="tablist">
+  <div class="tab active" id="tab-ds" role="tab" tabindex="0" onclick="showTab('ds')">Datasets</div>
+  <div class="tab" id="tab-bench" role="tab" tabindex="0" onclick="showTab('bench')">Benchmark</div>
 </div>
 
 <main>
   <!-- DATASETS -->
-  <section class="panel active" id="panel-ds">
-    <div class="card">
+  <section class="panel" id="panel-ds">
+    <div class="card tabtop">
       <div class="row">
-        <b>Benchmark dataset catalog</b>
+        <h2>Benchmark dataset catalog</h2>
+        <span class="badge b-prepared" id="ds-count"></span>
         <span class="spacer"></span>
-        <button class="ghost" onclick="loadDatasets()">↻ Refresh</button>
+        <button class="ghost sm" onclick="loadDatasets()">↻ Refresh</button>
       </div>
-      <div class="muted" id="cachedir" style="margin-top:6px"></div>
-      <div class="grid ds-grid" id="ds-list" style="margin-top:14px"></div>
+      <div class="hint" style="margin-top:6px">RelBench datasets are referenced with citations; <b>prepared</b> benchmarks materialize locally for offline, reproducible runs.</div>
+      <div class="grid ds-grid" id="ds-list" style="margin-top:16px"></div>
     </div>
   </section>
 
   <!-- BENCHMARK -->
-  <section class="panel" id="panel-bench">
-    <div class="grid" style="grid-template-columns:340px 1fr">
-      <div class="card">
-        <b>Configure benchmark</b>
-        <label>Dataset</label>
-        <select id="b_dataset" onchange="onDatasetChange()"></select>
-        <div class="note" id="b_dsnote"></div>
-        <label>Task</label>
-        <select id="b_task"></select>
-        <label>Model</label>
-        <select id="b_model">
-          <option>HeteroSAGE</option><option>RGCN</option><option>GAT</option><option selected>RelGT</option>
-        </select>
-        <div class="form-grid">
-          <div><label>Hidden dim</label><input id="b_hidden" type="number" value="64" step="8"></div>
-          <div><label>Heads</label><input id="b_heads" type="number" value="4"></div>
-          <div><label>Layers</label><input id="b_layers" type="number" value="2"></div>
-          <div><label>Dropout</label><input id="b_dropout" type="number" value="0.1" step="0.05"></div>
-          <div><label>Epochs</label><input id="b_epochs" type="number" value="40"></div>
-          <div><label>Seeds</label><input id="b_seeds" type="number" value="3" min="1" max="5"></div>
-        </div>
-        <button id="b_run" onclick="runBench()" style="margin-top:14px;width:100%">Run benchmark</button>
-        <div id="status"></div>
-      </div>
+  <section class="panel" id="panel-bench" style="display:none">
+    <div class="grid bench-grid">
       <div>
+        <div class="card tabtop" style="position:sticky;top:78px">
+          <h2>Configure benchmark</h2>
+          <label for="b_dataset">Dataset</label>
+          <select id="b_dataset" onchange="onDatasetChange()"></select>
+          <div class="hint" id="b_dsnote" style="margin-top:6px;min-height:14px"></div>
+          <label for="b_task">Task</label>
+          <select id="b_task"></select>
+          <label for="b_model">Model</label>
+          <select id="b_model">
+            <option>HeteroSAGE</option><option>RGCN</option><option>GAT</option><option selected>RelGT</option>
+          </select>
+          <div class="form-grid">
+            <div><label for="b_hidden">Hidden dim</label><input id="b_hidden" type="number" value="64" step="8"></div>
+            <div><label for="b_heads">Attention heads</label><input id="b_heads" type="number" value="4"></div>
+            <div><label for="b_layers">Layers</label><input id="b_layers" type="number" value="2"></div>
+            <div><label for="b_dropout">Dropout</label><input id="b_dropout" type="number" value="0.1" step="0.05"></div>
+            <div><label for="b_epochs">Epochs</label><input id="b_epochs" type="number" value="40"></div>
+            <div><label for="b_seeds">Seeds</label><input id="b_seeds" type="number" value="3" min="1" max="5"></div>
+          </div>
+          <button id="b_run" onclick="runBench()" style="margin-top:16px;width:100%">▶ Run benchmark</button>
+          <div class="hint" id="status" style="margin-top:10px;min-height:16px"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card tabtop">
+          <div class="row">
+            <h2>Result</h2>
+            <span class="spacer"></span>
+            <span class="headline num" id="b_headline"></span>
+          </div>
+          <div class="muted" id="b_subhead" style="margin-top:2px"></div>
+          <div id="b_result" style="display:none">
+            <div class="legend">
+              <span class="k"><span class="sw" style="background:#6c8cff"></span>train loss</span>
+              <span class="k"><span class="sw" style="background:#36d39b"></span>validation metric</span>
+            </div>
+            <div class="chartwrap">
+              <canvas id="chart" width="1000" height="280"></canvas>
+              <div id="tooltip"></div>
+            </div>
+            <div class="kpis" id="b_kpis"></div>
+            <h2 style="margin-top:20px;font-size:13px">Per-seed scores</h2>
+            <table id="b_seeds_tbl"><thead><tr><th>seed</th><th class="num">validation</th><th class="num">test</th></tr></thead><tbody></tbody></table>
+          </div>
+          <div class="empty" id="b_empty"><div class="big">📊</div><div>Configure a model and run a benchmark to see training curves, KPIs, and per-seed scores.</div></div>
+        </div>
+
         <div class="card">
-          <div class="row"><b>Result</b><span class="spacer"></span><span id="b_headline" class="headline"></span></div>
-          <div class="muted" id="b_subhead"></div>
-          <div class="legend" style="margin-top:8px">curves: <b>train loss</b> · <i>validation metric</i></div>
-          <canvas id="chart" width="900" height="240"></canvas>
-          <div class="kpis" id="b_kpis"></div>
-          <table id="b_seeds_tbl" style="display:none"><thead><tr><th>seed</th><th>val</th><th>test</th></tr></thead><tbody></tbody></table>
+          <div class="row">
+            <h2>Run comparison</h2>
+            <span class="muted" id="runs-count"></span>
+            <span class="spacer"></span>
+            <button class="ghost sm" onclick="copyMarkdown()">⧉ Copy Markdown</button>
+            <button class="ghost sm" onclick="clearRuns()">Clear</button>
+          </div>
+          <div id="runs-empty" class="hint" style="margin-top:8px">Completed runs accumulate here for side-by-side comparison. Best score per dataset/task is highlighted.</div>
+          <table id="runs-tbl" style="display:none">
+            <thead><tr><th>Model</th><th>Dataset</th><th>Task</th><th class="num">Test (mean±std)</th><th class="num">Val</th><th class="num">Epochs</th></tr></thead>
+            <tbody></tbody>
+          </table>
         </div>
       </div>
     </div>
   </section>
 </main>
 
+<footer>
+  <span>GaussRDL · Gaussian Technologies — advanced AI research for relational data</span>
+  <span class="spacer" style="flex:1"></span>
+  <span>SOTA survey · model review · README in repo</span>
+</footer>
+
 <script>
 let CATALOG = [];
+let RUNS = [];
+let CHART = null; // {pts:{loss,val}, geom}
+
+// ---------- toasts ----------
+function toast(msg, kind='info', ms=3200){
+  const t=document.createElement('div'); t.className='toast '+kind; t.textContent=msg;
+  document.getElementById('toasts').appendChild(t);
+  setTimeout(()=>{t.style.transition='.3s';t.style.opacity='0';t.style.transform='translateX(20px)';setTimeout(()=>t.remove(),300)}, ms);
+}
 
 function showTab(t){
-  document.getElementById('tab-ds').classList.toggle('active', t==='ds');
-  document.getElementById('tab-bench').classList.toggle('active', t==='bench');
-  document.getElementById('panel-ds').classList.toggle('active', t==='ds');
-  document.getElementById('panel-bench').classList.toggle('active', t==='bench');
+  const ds=t==='ds';
+  document.getElementById('tab-ds').classList.toggle('active', ds);
+  document.getElementById('tab-bench').classList.toggle('active', !ds);
+  document.getElementById('panel-ds').style.display = ds?'block':'none';
+  document.getElementById('panel-bench').style.display = ds?'none':'block';
 }
 function fmtBytes(b){ if(!b) return '—'; const u=['B','KB','MB','GB']; let i=0; while(b>=1024&&i<u.length-1){b/=1024;i++;} return b.toFixed(1)+' '+u[i]; }
 
+// ---------- datasets ----------
 async function loadDatasets(){
-  const r = await fetch('/api/datasets'); const d = await r.json();
+  let d;
+  try{ const r=await fetch('/api/datasets'); d=await r.json(); }
+  catch(e){ toast('Could not load catalog: '+e,'err'); return; }
   CATALOG = d.datasets;
-  document.getElementById('cachedir').textContent = 'cache: '+d.cache_dir;
+  document.getElementById('cachedir').textContent = '🗂 '+d.cache_dir;
+  document.getElementById('ds-count').textContent = d.datasets.length+' datasets';
   const host = document.getElementById('ds-list'); host.innerHTML='';
   for(const ds of d.datasets){
-    const stClass = ds.status==='ready'?'b-ready':(ds.status==='error'?'b-err':'b-no');
-    const stText = ds.status==='ready'?'ready':(ds.status==='error'?'error':'not downloaded');
+    const ready = ds.status==='ready';
+    const stClass = ready?'b-ready':(ds.status==='error'?'b-err':'b-no');
+    const stText = ready?'ready':(ds.status==='error'?'error':'not downloaded');
     const kind = ds.official?'<span class="badge b-official">RelBench</span>':'<span class="badge b-prepared">prepared</span>';
-    const tasks = ds.tasks.map(t=>`<span class="chip" title="${t.description}">${t.name} · ${t.metric}${t.runnable?'':' (needs upstream)'}</span>`).join('');
-    const dlLabel = ds.offline_capable ? 'Download' : 'Download (needs network)';
-    const el = document.createElement('div'); el.className='ds';
+    const tasks = ds.tasks.map(t=>`<span class="chip ${t.runnable?'':'off'}" title="${esc(t.description)}">${t.name} · ${t.metric}</span>`).join('');
+    const dlLabel = ds.offline_capable ? 'Prepare' : 'Download';
+    const el = document.createElement('div'); el.className='ds'; el.dataset.id=ds.id;
     el.innerHTML = `
-      <div class="row"><h3>${ds.display_name}</h3><span class="spacer"></span>${kind}</div>
-      <div class="meta">${ds.domain} · ${ds.approx_size} · <span class="badge ${stClass}">${stText}</span> ${ds.status==='ready'?'· '+fmtBytes(ds.size_bytes):''}</div>
-      <div class="desc">${ds.description}</div>
+      <div class="row"><h3>${esc(ds.display_name)}</h3><span class="spacer"></span>${kind}</div>
+      <div class="meta">${esc(ds.domain)} · ${esc(ds.approx_size)}
+        <span class="badge ${stClass}"><span class="dot"></span>${stText}</span>${ready?'· <span class="num">'+fmtBytes(ds.size_bytes)+'</span>':''}</div>
+      <div class="desc">${esc(ds.description)}</div>
       <div class="chips">${tasks}</div>
       <div class="row" style="margin-top:6px">
-        <button data-id="${ds.id}" class="dl" ${ds.status==='ready'?'disabled':''}>${dlLabel}</button>
-        <button data-id="${ds.id}" class="rm danger" ${ds.status==='ready'?'':'disabled'}>Delete</button>
+        <button class="dl sm" ${ready?'disabled':''}>${ready?'✓ Ready':dlLabel}</button>
+        <button class="rm danger sm" ${ready?'':'disabled'}>Delete</button>
         <span class="spacer"></span>
-        <span class="muted" title="${ds.citation}">cite ⓘ</span>
+        <button class="ghost sm cite" title="copy citation">cite</button>
       </div>`;
     host.appendChild(el);
+    el.querySelector('.dl').onclick=()=>download(ds.id, el);
+    el.querySelector('.rm').onclick=()=>del(ds.id);
+    el.querySelector('.cite').onclick=()=>{navigator.clipboard?.writeText(ds.citation); toast('Citation copied','ok');};
   }
-  host.querySelectorAll('button.dl').forEach(b=>b.onclick=()=>download(b.dataset?b.dataset:b.getAttribute('data-id')));
-  host.querySelectorAll('button.rm').forEach(b=>b.onclick=()=>del(b.getAttribute('data-id')));
   populateDatasetSelect();
 }
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 
-async function download(id){
-  const btns=document.querySelectorAll('button'); btns.forEach(b=>b.disabled=true);
+async function download(id, card){
+  const dl=card.querySelector('.dl'); const orig=dl.innerHTML;
+  dl.disabled=true; dl.innerHTML='<span class="spin"></span> working…';
   try{
     const r=await fetch('/api/datasets/download',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
     const d=await r.json();
-    if(d.error||d.status==='error') alert('Download failed: '+(d.error||'unknown'));
-  }catch(e){ alert('Download error: '+e); }
+    if(d.error||d.status==='error'){ toast('Failed: '+(d.error||'unknown'),'err',6000); }
+    else toast('Dataset ready: '+id,'ok');
+  }catch(e){ toast('Error: '+e,'err'); }
+  dl.innerHTML=orig;
   await loadDatasets();
 }
 async function del(id){
-  await fetch('/api/datasets/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+  try{ await fetch('/api/datasets/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})}); toast('Removed '+id,'info'); }
+  catch(e){ toast('Error: '+e,'err'); }
   await loadDatasets();
 }
 
@@ -188,7 +318,7 @@ function populateDatasetSelect(){
   const sel=document.getElementById('b_dataset'); const prev=sel.value; sel.innerHTML='';
   for(const ds of CATALOG){
     const o=document.createElement('option'); o.value=ds.id;
-    o.textContent=`${ds.display_name} ${ds.status==='ready'?'✓':'(not downloaded)'}`;
+    o.textContent=`${ds.display_name} ${ds.status==='ready'?'✓':'·'}`;
     sel.appendChild(o);
   }
   if(prev) sel.value=prev;
@@ -203,59 +333,132 @@ function onDatasetChange(){
     const o=document.createElement('option'); o.value=t.name; o.textContent=`${t.name} · ${t.metric}`;
     if(!t.runnable) o.disabled=true; tsel.appendChild(o);
   }
-  if(ds.status!=='ready'){ note.textContent = ds.offline_capable
-    ? 'Not downloaded — it will be prepared automatically when you run.'
-    : 'Official RelBench dataset — requires network access to the source host.'; }
-  else note.textContent='';
+  note.innerHTML = ds.status==='ready' ? '<span style="color:var(--ok)">● ready</span> · trains locally'
+    : (ds.offline_capable ? '◍ will be prepared automatically on run'
+       : '<span style="color:var(--warn)">⚠ official RelBench dataset — needs network access to the source host</span>');
 }
 
-function drawLine(ctx,W,H,arr,color,pad){
-  if(arr.length<2)return; const mn=Math.min(...arr),mx=Math.max(...arr);
-  ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();
-  for(let i=0;i<arr.length;i++){const x=pad+(W-2*pad)*i/(arr.length-1);
-    const y=H-pad-(H-2*pad)*(arr[i]-mn)/((mx-mn)||1); i?ctx.lineTo(x,y):ctx.moveTo(x,y);} ctx.stroke();
-}
+// ---------- chart (dual-axis, hover) ----------
+function niceBounds(mn,mx){ if(mn===mx){mn-=1;mx+=1;} const pad=(mx-mn)*0.08; return [mn-pad,mx+pad]; }
 function drawChart(hist){
-  const c=document.getElementById('chart'),ctx=c.getContext('2d'),W=c.width,H=c.height,pad=24;
+  const c=document.getElementById('chart'); const dpr=window.devicePixelRatio||1;
+  const cssW=c.clientWidth||1000, cssH=280;
+  c.width=cssW*dpr; c.height=cssH*dpr; const ctx=c.getContext('2d'); ctx.scale(dpr,dpr);
+  const W=cssW,H=cssH, L=46,R=46,T=16,B=28; const pw=W-L-R, ph=H-T-B;
   ctx.clearRect(0,0,W,H);
-  drawLine(ctx,W,H,hist.map(e=>e.train_loss),'#5b8cff',pad);
-  drawLine(ctx,W,H,hist.map(e=>e.val_metric),'#37d39b',pad);
+  const loss=hist.map(e=>e.train_loss), val=hist.map(e=>e.val_metric), n=hist.length;
+  if(n<1){return;}
+  const [l0,l1]=niceBounds(Math.min(...loss),Math.max(...loss));
+  const [v0,v1]=niceBounds(Math.min(...val),Math.max(...val));
+  const X=i=> L + (n<2?pw/2:pw*i/(n-1));
+  const Yl=v=> T + ph*(1-(v-l0)/((l1-l0)||1));
+  const Yv=v=> T + ph*(1-(v-v0)/((v1-v0)||1));
+  // grid + axes
+  ctx.strokeStyle='rgba(255,255,255,.06)'; ctx.lineWidth=1; ctx.font='10px Inter,sans-serif';
+  for(let g=0;g<=4;g++){ const y=T+ph*g/4; ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(W-R,y);ctx.stroke();
+    ctx.fillStyle='rgba(108,140,255,.8)'; ctx.textAlign='right'; ctx.fillText((l1-(l1-l0)*g/4).toFixed(2), L-6, y+3);
+    ctx.fillStyle='rgba(54,211,155,.85)'; ctx.textAlign='left'; ctx.fillText((v1-(v1-v0)*g/4).toFixed(2), W-R+6, y+3);
+  }
+  ctx.fillStyle='rgba(132,147,184,.8)'; ctx.textAlign='center';
+  for(let g=0;g<=4;g++){ const i=Math.round((n-1)*g/4); ctx.fillText('e'+i, X(i), H-8); }
+  // loss area + line
+  ctx.beginPath(); ctx.moveTo(X(0),Yl(loss[0])); for(let i=1;i<n;i++)ctx.lineTo(X(i),Yl(loss[i]));
+  ctx.lineTo(X(n-1),T+ph); ctx.lineTo(X(0),T+ph); ctx.closePath();
+  const grd=ctx.createLinearGradient(0,T,0,T+ph); grd.addColorStop(0,'rgba(108,140,255,.22)'); grd.addColorStop(1,'rgba(108,140,255,0)');
+  ctx.fillStyle=grd; ctx.fill();
+  function line(arr,Y,color){ ctx.strokeStyle=color;ctx.lineWidth=2.2;ctx.beginPath();
+    for(let i=0;i<n;i++){const x=X(i),y=Y(arr[i]); i?ctx.lineTo(x,y):ctx.moveTo(x,y);} ctx.stroke(); }
+  line(loss,Yl,'#6c8cff'); line(val,Yv,'#36d39b');
+  CHART={n,loss,val,L,R,T,B,W,H,pw,ph,X,Yl,Yv,hist};
 }
-function kpi(k,v){return `<div class="kpi"><div class="v">${v}</div><div class="k">${k}</div></div>`}
+(function bindHover(){
+  const c=document.getElementById('chart'), tip=document.getElementById('tooltip');
+  c.addEventListener('mousemove',ev=>{
+    if(!CHART){return;} const rect=c.getBoundingClientRect(); const x=ev.clientX-rect.left;
+    const {n,L,pw,hist}=CHART; const i=Math.max(0,Math.min(n-1,Math.round((x-L)/(pw/((n-1)||1)))));
+    const e=hist[i]; if(!e){tip.style.display='none';return;}
+    tip.style.display='block'; tip.style.left=Math.min(rect.width-150,x+10)+'px'; tip.style.top='14px';
+    tip.innerHTML=`<b>epoch ${e.epoch}</b><br><span style="color:#6c8cff">loss ${e.train_loss.toFixed(4)}</span><br><span style="color:#36d39b">val ${e.val_metric.toFixed(4)}</span><br><span class="muted">lr ${e.learning_rate.toExponential(2)} · |g| ${e.grad_norm.toFixed(2)}</span>`;
+  });
+  c.addEventListener('mouseleave',()=>{tip.style.display='none'});
+})();
 
+function kpi(k,v){return `<div class="kpi"><div class="v num">${v}</div><div class="k">${k}</div></div>`}
+
+// ---------- run benchmark ----------
 async function runBench(){
-  const btn=document.getElementById('b_run'); btn.disabled=true;
-  document.getElementById('status').textContent='Running benchmark (training across seeds)…';
-  const body={dataset:document.getElementById('b_dataset').value,task:document.getElementById('b_task').value,
-    model:document.getElementById('b_model').value,hidden_dim:+document.getElementById('b_hidden').value,
-    num_heads:+document.getElementById('b_heads').value,num_layers:+document.getElementById('b_layers').value,
-    dropout:+document.getElementById('b_dropout').value,epochs:+document.getElementById('b_epochs').value,
-    seeds:+document.getElementById('b_seeds').value};
+  const btn=document.getElementById('b_run'); const ds=document.getElementById('b_dataset').value;
+  const task=document.getElementById('b_task').value;
+  if(!task){ toast('Select a runnable task','err'); return; }
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span> Running…';
+  document.getElementById('status').innerHTML='<span class="spin"></span> Training across seeds — leakage-free temporal splits…';
+  const body={dataset:ds,task,model:document.getElementById('b_model').value,
+    hidden_dim:+document.getElementById('b_hidden').value,num_heads:+document.getElementById('b_heads').value,
+    num_layers:+document.getElementById('b_layers').value,dropout:+document.getElementById('b_dropout').value,
+    epochs:+document.getElementById('b_epochs').value,seeds:+document.getElementById('b_seeds').value};
   try{
     const r=await fetch('/api/benchmark',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const d=await r.json();
-    if(d.error){document.getElementById('status').textContent='Error: '+d.error; btn.disabled=false; return;}
-    document.getElementById('b_headline').textContent=`${d.test_mean.toFixed(4)} ± ${d.test_std.toFixed(4)} ${d.metric_name}`;
-    document.getElementById('b_subhead').textContent=
-      `${d.model} on ${d.dataset}/${d.task} · ${d.num_nodes} nodes / ${d.num_edges} edges / ${d.num_relations} relations · ${d.higher_is_better?'higher':'lower'} is better`;
-    drawChart(d.history.epochs);
-    const inf=d.inference; let html='';
-    html+=kpi('test '+d.metric_name, d.test_mean.toFixed(4));
-    html+=kpi('val '+d.metric_name, d.val_mean.toFixed(4));
-    html+=kpi('std (seeds)', d.test_std.toFixed(4));
-    html+=kpi('throughput/s', Math.round(inf.throughput_per_s));
-    if(d.metric_name==='ROC-AUC'){ html+=kpi('accuracy',inf.accuracy.toFixed(4)); html+=kpi('Brier',inf.brier.toFixed(4)); }
-    else { html+=kpi('RMSE',inf.rmse.toFixed(2)); html+=kpi('R²',inf.r2.toFixed(3)); }
-    html+=kpi('latency ms',inf.latency_ms.toFixed(1));
-    html+=kpi('epochs',d.history.epochs.length);
-    document.getElementById('b_kpis').innerHTML=html;
-    const tb=document.getElementById('b_seeds_tbl'); tb.style.display='table';
-    tb.querySelector('tbody').innerHTML=d.seeds.map(s=>`<tr><td>${s.seed}</td><td>${s.val.toFixed(4)}</td><td>${s.test.toFixed(4)}</td></tr>`).join('');
-    document.getElementById('status').textContent='Done.';
-  }catch(e){document.getElementById('status').textContent='Error: '+e;}
-  btn.disabled=false;
+    if(d.error){ document.getElementById('status').textContent='Error: '+d.error; toast(d.error,'err',6000); }
+    else { renderResult(d); recordRun(d); toast('Benchmark complete','ok'); document.getElementById('status').textContent='Done.'; }
+  }catch(e){ document.getElementById('status').textContent='Error: '+e; toast('Error: '+e,'err'); }
+  btn.disabled=false; btn.innerHTML='▶ Run benchmark';
 }
 
+function renderResult(d){
+  document.getElementById('b_empty').style.display='none';
+  document.getElementById('b_result').style.display='block';
+  const arrow=d.higher_is_better?'↑':'↓';
+  document.getElementById('b_headline').textContent=`${d.test_mean.toFixed(4)} ± ${d.test_std.toFixed(4)}`;
+  document.getElementById('b_subhead').innerHTML=
+    `<b>${d.model}</b> on <b>${d.dataset}/${d.task}</b> · ${d.metric_name} (${arrow} better) · ${d.num_nodes.toLocaleString()} nodes / ${d.num_edges.toLocaleString()} edges / ${d.num_relations} relations`;
+  drawChart(d.history.epochs);
+  const inf=d.inference; let html='';
+  html+=kpi('test '+d.metric_name, d.test_mean.toFixed(4));
+  html+=kpi('val '+d.metric_name, d.val_mean.toFixed(4));
+  html+=kpi('std over seeds', '±'+d.test_std.toFixed(4));
+  html+=kpi('throughput', Math.round(inf.throughput_per_s)+'/s');
+  if(d.metric_name==='ROC-AUC'){ html+=kpi('accuracy',inf.accuracy.toFixed(4)); html+=kpi('Brier ↓',inf.brier.toFixed(4)); }
+  else { html+=kpi('RMSE ↓',inf.rmse.toFixed(2)); html+=kpi('R²',inf.r2.toFixed(3)); }
+  html+=kpi('latency', inf.latency_ms.toFixed(1)+' ms');
+  html+=kpi('epochs', d.history.epochs.length);
+  document.getElementById('b_kpis').innerHTML=html;
+  document.getElementById('b_seeds_tbl').querySelector('tbody').innerHTML=
+    d.seeds.map(s=>`<tr><td>seed ${s.seed}</td><td class="num">${s.val.toFixed(4)}</td><td class="num">${s.test.toFixed(4)}</td></tr>`).join('');
+}
+
+// ---------- run comparison ----------
+function recordRun(d){
+  RUNS.push({model:d.model,dataset:d.dataset,task:d.task,metric:d.metric_name,
+    test_mean:d.test_mean,test_std:d.test_std,val_mean:d.val_mean,hib:d.higher_is_better,epochs:d.history.epochs.length});
+  renderRuns();
+}
+function renderRuns(){
+  const tbl=document.getElementById('runs-tbl'), empty=document.getElementById('runs-empty');
+  document.getElementById('runs-count').textContent=RUNS.length?`${RUNS.length} runs`:'';
+  if(!RUNS.length){ tbl.style.display='none'; empty.style.display='block'; return; }
+  empty.style.display='none'; tbl.style.display='table';
+  // best per dataset/task
+  const best={};
+  RUNS.forEach(r=>{ const k=r.dataset+'/'+r.task; if(!(k in best)) best[k]=r.test_mean;
+    else best[k]=r.hib?Math.max(best[k],r.test_mean):Math.min(best[k],r.test_mean); });
+  tbl.querySelector('tbody').innerHTML=RUNS.map(r=>{
+    const isBest=Math.abs(best[r.dataset+'/'+r.task]-r.test_mean)<1e-9;
+    return `<tr class="${isBest?'best':''}"><td>${r.model}</td><td>${r.dataset}</td><td>${r.task} <span class="muted">(${r.metric})</span></td>`
+      +`<td class="num">${r.test_mean.toFixed(4)} ± ${r.test_std.toFixed(4)}</td><td class="num">${r.val_mean.toFixed(4)}</td><td class="num">${r.epochs}</td></tr>`;
+  }).join('');
+}
+function clearRuns(){ RUNS=[]; renderRuns(); }
+function copyMarkdown(){
+  if(!RUNS.length){ toast('No runs to copy','info'); return; }
+  let md='| Model | Dataset | Task | Metric | Test (mean±std) | Val |\n|---|---|---|---|---|---|\n';
+  md+=RUNS.map(r=>`| ${r.model} | ${r.dataset} | ${r.task} | ${r.metric} | ${r.test_mean.toFixed(4)} ± ${r.test_std.toFixed(4)} | ${r.val_mean.toFixed(4)} |`).join('\n');
+  navigator.clipboard?.writeText(md); toast('Results table copied as Markdown','ok');
+}
+
+document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&document.getElementById('panel-bench').style.display!=='none'
+  && !['SELECT'].includes(document.activeElement.tagName)) runBench(); });
+window.addEventListener('resize',()=>{ if(CHART) drawChart(CHART.hist); });
 loadDatasets();
 </script>
 </body>

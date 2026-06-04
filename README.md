@@ -177,17 +177,25 @@ paper-faithful evaluation.
   (ROC-AUC / MAE) as **mean ± std over seeds**, with leakage-free temporal
   splits and validation-based selection.
 
-Both UIs expose this. The **TUI** (`gaussrdl-tui`) has a *Datasets* tab (browse,
-download/prepare, delete) and a *Benchmark* tab (configure, run, watch live
-training, read mean ± std + KPIs):
+Both UIs are designed for researchers — clean, fast, and legible.
+
+The **TUI** (`gaussrdl-tui`) is a polished `ratatui` app: a tab bar with rounded
+panels, a *Datasets* tab rendering the catalog as a selectable **table** with a
+live details pane, and a *Benchmark* tab with a configuration list, **two
+labelled chart panels** (training loss + validation metric with axes), a
+spinner during work, and a results/KPI panel with `mean ± std` and per-seed
+scores.
 
 ```bash
-cargo run -p gaussrdl-tui   # Tab switch · ↑/↓ select · ←/→ adjust · d download · x delete · Enter run · q quit
+cargo run -p gaussrdl-tui   # Tab switch · ↑/↓ select · ←/→ adjust · d prepare · x delete · Enter run · q quit
 ```
 
-The **Web UI** (`gaussrdl-web`, axum) has a *Datasets* view with download/delete
-buttons and status badges, and a *Benchmark* view with live loss/validation
-curves, a per-seed table, and an inference-KPI grid:
+The **Web UI** (`gaussrdl-web`, axum) is a refined dark-theme single page with
+toast notifications and per-card download states on the *Datasets* view, and a
+*Benchmark* view featuring a **dual-axis training chart with hover tooltips**
+(loss vs. validation), an inference-KPI grid, a per-seed table, and a
+**run-comparison table** that highlights the best score per dataset/task and
+**copies results as a Markdown table** for papers:
 
 ```bash
 cargo run -p gaussrdl-web   # open http://127.0.0.1:8080
